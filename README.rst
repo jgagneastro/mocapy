@@ -1,3 +1,30 @@
+mocapy
+=====
+
+**A Python package to interact with the MOCA database**
+
+mocapy is still under development, and allows users to connect to the MOCA database, run raw SQL queries and obtain the resulting data in the form of a pandas DataFrame.
+
+Documentation
+-------------
+
+The full documentation for this project is not yet available.
+
+License
+-------
+
+Copyright 2022 Jonathan Gagne.
+
+mocapy is free software made available under the MIT License. For details see
+the LICENSE file.
+
+You can install this package with pip install git+https://github.com/jgagneastro/mocapy.git
+
+More details about MOCA
+-----------------------
+
+This section will eventually be translated from French and gives more details about the MOCA database and how it can be used.
+
 Je vous mets ici quelques informations par rapport à la base de données des étoiles jeunes ("Montreal Open Clusters and Associations"/MOCA database). Elle est en language MySQL, qui est vraiment très bien documenté sur internet.
 
 Elle est plutôt complète jusqu'à 500 pc, mais j'ai récemment commencé à ajouter des amas ouverts un peu plus distants aussi. Elle contient aussi presque toutes les naines brunes connues.
