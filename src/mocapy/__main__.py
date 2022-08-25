@@ -1,5 +1,8 @@
 __author__ = 'Jonathan Gagne'
 __email__ = 'jonathan.gagne@astro.umontreal.ca'
+__uri__ = "https://github.com/jgagneastro/mocapy"
+__license__ = "MIT"
+__description__ = "A Python package to interact with the MOCA database"
 
 #Example code
 
