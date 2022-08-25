@@ -1,0 +1,479 @@
+{\rtf1\ansi\ansicpg1252\cocoartf2638
+\cocoatextscaling0\cocoaplatform0{\fonttbl\f0\fswiss\fcharset0 Helvetica;\f1\fswiss\fcharset0 Helvetica-Bold;\f2\fnil\fcharset0 HelveticaNeue;
+}
+{\colortbl;\red255\green255\blue255;}
+{\*\expandedcolortbl;;}
+\margl1440\margr1440\vieww13440\viewh7800\viewkind0
+\pard\tx566\tx1133\tx1700\tx2267\tx2834\tx3401\tx3968\tx4535\tx5102\tx5669\tx6236\tx6803\pardirnatural\partightenfactor0
+
+\f0\fs24 \cf0 Je vous mets ici quelques informations par rapport \'e0 la base de donn\'e9es des \'e9toiles jeunes ("Montreal Open Clusters and Associations"/MOCA database). Elle est en language MySQL, qui est vraiment tr\'e8s bien document\'e9 sur internet.\
+\
+Elle est plut\'f4t compl\'e8te jusqu'\'e0 500 pc, mais j'ai r\'e9cemment commenc\'e9 \'e0 ajouter des amas ouverts un peu plus distants aussi. Elle contient aussi presque toutes les naines brunes connues.\
+\
+Pour l'utiliser, t\'e9l\'e9chargez l'app Sequel Ace sur le Apple Store, puis utilisez les informations suivantes (\'e0 ne pas partager car la DB n'est pas encore publique):\
+\
+	
+\f1\b MySQL host :
+\f0\b0  104.248.106.21\
+	
+\f1\b MySQL database :
+\f0\b0  mocadb\
+	
+\f1\b MySQL username :
+\f0\b0  public\
+	
+\f1\b MySQL password :
+\f0\b0  
+\f2\fs26 z@nUg_2h7_%?31y88
+\f0\fs24 \
+\
+Vous pouvez ensuite consulter les tables list\'e9es \'e0 gauche, et changer de mode avec les boutons dans la barre du haut. "Structure" vous donne acc\'e8s aux colonnes d'une table et leur type (voir "Comments" pour une description, je n'ai pas fini de les documenter); "Contents" vous montre les premi\'e8res lignes du contenu, que vous pouvez filtrer avec le petit bouton d'entonnoir en bas de la table. "Query" vous permet de lancer des requ\'eates SQL, de voir les r\'e9sultats, et de les t\'e9l\'e9charger en CSV au besoin. Il y a aussi un bouton "Table Info" qui vous permet de voir une description de chaque table.\
+\
+Vous avez aussi acc\'e8s \'e0 la base de donn\'e9es "mocadb_private_tables" avec le menu d\'e9roulant en haut, qui contient aussi des donn\'e9es non publi\'e9es. Je suis activement en train de travailler sur cette base de donn\'e9es donc elle change beaucoup en ce moment; la DB par default "mocadb" est un snapshot fixe du ~10 juin 2022, qui sera g\'e9n\'e9r\'e9e automatiquement \'e0 partir de mocadb_private_tables en omettant les donn\'e9es priv\'e9es quand j'aurai termin\'e9 de construire l'infrastructure.\
+\
+Vous pouvez communiquer directement avec la base de donn\'e9es avec les packages Python pandas et sqlalchemy, mais si vous entrez le password en format string directement dans votre code vous allez devoir transformer certains symboles pour que \'e7a fonctionne (une recherche Google vous donnera plus d'informations l\'e0-dessus). Voir la fonctions read_sql de pandas en particulier.\
+\
+Dans la database, les colonnes moca_* sont utiles pour connecter des tables ensemble avec JOIN. Par exemple, moca_oid est un identifiant unique pour chaque \'e9toile, moca_aid pour chaque association, et moca_pid pour les publications scientifiques.\
+\
+La database contient quelques proc\'e9dures et fonctions qui sont list\'e9es sous les tables. Celles qui commencent par "engine_" dans la DB priv\'e9e sont pour la mise \'e0 jour des donn\'e9es, vous ne pourrez pas les rouler. Vous pouvez appeler les autres fonctions dans la vue SQL Query avec la syntaxe "CALL function_name(input);"\
+\
+Voici quelques fonctions utiles:\
+\
+REPORT: obtenir une vue d'ensemble des informations relatives \'e0 une \'e9toile \'e0 partir de son nom. Utiliser % pour un wildcard, mais \'e9vitez de commencer le nom par un wildcard sinon \'e7a sera tr\'e8s lent. Exemple: CALL REPORT('SIMP%0136%');\
+\
+GAIAREPORT: Similaire, mais fonctionne juste avec les source_id de Gaia (tous les data release). C'est plus rapide que d'utiliser REPORT avec un wildcard.\
+\
+IDREPORT: Similaire, mais prend en input un chiffre moca_oid.\
+\
+AREPORT: obtenir une vue d'ensemble des informations relatives \'e0 une association d'\'e9toiles, \'e0 partir de son nom. Exemple: CALL AREPORT('AB Dor%');\
+\
+AIDREPORT: Similaire, mais prend en entr\'e9e un string moca_aid.\
+\
+Les tables de la base de donn\'e9es ont des pr\'e9fixes qui indiquent le type de table:\
+\
+cat_ sont des sections de catalogues astronomiques, tels que Gaia ou 2MASS. Ils sont t\'e9l\'e9charg\'e9s tels quels de serveurs astronomiques pour les \'e9toiles pr\'e9sentes dans MOCAdb.\
+\
+data_ sont des donn\'e9es brutes de la litt\'e9rature, typiquement reli\'e9s \'e0 une \'e9toile ou une association. Certaines de ces donn\'e9es sont import\'e9es des tables cat_ automatiquement et p\'e9riodiquement par l'infrastructure de MOCAdb. D'autres sont t\'e9l\'e9charg\'e9es directement de Vizier ou de papiers scientifiques.\
+\
+calc_ sont des valeurs calcul\'e9es automatiquement par l'infrastructure MOCAdb. Parfois ce sont des combinaisons de toutes les mesures disponibles par \'e9toile, parfois ce sont des quantit\'e9s nouvelles.\
+\
+cdata_ contiennent un mix de donn\'e9es de litt\'e9rature (typiquement avec un moca_pid non nul) ou de calculs faits par MOCAdb (typiquement avec un md5_uid non nul).\
+\
+mechanics_ contiennent des tables g\'e9n\'e9r\'e9es automatiquement par MOCAdb qui font intervenir des combinaisons d'autres tables dans la DB mais pas n\'e9cessairement des calculs.\
+\
+summary_ contiennent des tables-sommaire regroupant des donn\'e9es d'un ensemble d'autres tables dans la DB.\
+\
+priv_ contiennent des tables non publi\'e9es.\
+\
+pcat_ contiennent dew catalogues priv\'e9s (non publi\'e9s).\
+\
+Vous avez aussi acc\'e8s \'e0 des s\'e9quences astronomiques (couleur-mag, masse vs type spectral etc) d\'e9crites dans la table moca_astrophysical_sequences. Choisissez le moca_seqid qui vous int\'e9resse depuis cette table, puis allez chercher les donn\'e9es dans la table data_astrophysical_sequences en choisissant seulement les lignes qui ont cette valeur de moca_seqid et vous avez votre s\'e9quence.\
+\
+Voici quelques exemples de code SQL:\
+\
+SELECT *\
+FROM mechanics_all_designations\
+WHERE designation LIKE "SIMP%0136%";\
+\
+Cette requ\'eate vous permettra de retrouver le moca_oid de SIMP0136 en regardant la compilation de toutes les d\'e9signations de la base de donn\'e9es. Notez que les retour de lignes sont facultatifs. La partie SELECT * signifie que je veux retrouver toutes les colonnes de la table dans mon r\'e9sultat.\
+\
+SELECT *\
+FROM mechanics_all_designations\
+INNER JOIN cdata_spectral_types USING(moca_oid)\
+WHERE designation LIKE "SIMP%0136%";\
+\
+Cette requ\'eate joindra sur votre r\'e9sultat toutes les mesures de type spectraux associ\'e9es \'e0 SIMP0136 dans la base de donn\'e9es. Notez que INNER JOIN peut \'eatre aussi simplement appel\'e9 JOIN. La clause USIGN signifie que vous joindrez les lignes pour lesquelles moca_oid sont identiques. Cette clause peut aussi \'eatre remplac\'e9e par ON(designation.moca_oid=cdata_spectral_types.moca_oid) qui pourrait contenir des tests logiques plus complexes si d\'e9sir\'e9. Notez aussi que les JOIN utilisant des colonnes index\'e9es dans la base de donn\'e9es (telles que moca_oid) seront tr\'e8s rapides, mais ceux effectu\'e9s sur des colonnes non index\'e9es seront beaucoup plus lents (les index prennent de l'espace disque et j'en ai g\'e9n\'e9ralement construit seulement pour les colonnes moca_*).\
+\
+SELECT *\
+FROM mechanics_all_designations\
+INNER JOIN cdata_spectral_types USING(moca_oid)\
+WHERE designation LIKE "SIMP%";\
+\
+Cette requ\'eate vous permettra d'obtenir une liste de tous les objets avec une d\'e9signation SIMP avec leurs types spectraux. Chaque objet pour lequel plusieurs types spectraux ont \'e9t\'e9 publi\'e9s se retrouvera r\'e9p\'e9t\'e9 dans plusieurs lignes. Pour obtenir seulement un type spectral, on pourrait utiliser:\
+\
+SELECT mad.designation, spt.moca_oid, spt.spectral_type\
+FROM mechanics_all_designations AS mad\
+INNER JOIN cdata_spectral_types AS spt USING(moca_oid)\
+WHERE designation LIKE "SIMP%"\
+GROUP BY mad.moca_oid;\
+\
+Ici, j'ai sp\'e9cifi\'e9 des surnoms pour les tables (mad et spt) pour simplifier la requ\'eate (le mot AS pourrait \'eatre omis enti\'e8rement), et un GROUP BY pour combiner ensemble toutes les lignes dont le moca_oid est identique. Notez que l'ordre des clauses importe, WHERE doit suivre tous les JOIN, et pr\'e9c\'e9der GROUP BY. Telle quelle, cette commande retournera n'importe quelle valeur de type spectral disponible, sans pr\'e9f\'e9rence. Remarquez que j'ai aussi seulement s\'e9lectionn\'e9 quelques colonnes dans cette requ\'eate. Je pourrais aussi concat\'e9ner toutes les valeurs de types spectraux publi\'e9es ainsi:\
+\
+SELECT mad.designation, spt.moca_oid, GROUP_CONCAT(spt.spectral_type) AS all_spts\
+FROM mechanics_all_designations AS mad\
+INNER JOIN cdata_spectral_types AS spt USING(moca_oid)\
+WHERE designation LIKE "SIMP%"\
+GROUP BY mad.moca_oid;\
+\
+On pourrait aussi aller chercher seulement le type spectral le plus r\'e9cent pour chaque objet en utilisant la date de publication dans la table moca_publications, qui sera jointe en utilisant le moca_pid associ\'e9 \'e0 chaque mesure de type spectral:\
+\
+SELECT mad.designation, spt.moca_oid, spt.spectral_type, mp.moca_pid, mp.pubdate\
+FROM mechanics_all_designations AS mad\
+INNER JOIN cdata_spectral_types AS spt USING(moca_oid)\
+INNER JOIN moca_publications AS mp ON(mp.moca_pid=spt.moca_pid)\
+WHERE designation LIKE "SIMP%";\
+\
+Notez que dans une situation comme ici o\'f9 plus de 2 tables ont d\'e9j\'e0 une colonne moca_pid (mechanics_all_designations et cdata_spectral_types peuvent chacun \'eatre associ\'e9s \'e0 une publication), nous avons \'e9t\'e9 forc\'e9s de remplacer USING par ON et de specifier les moca_pid de quelles tables doivent se connecter.\
+\
+Ici, je n'ai pas tout de suite utilis\'e9 un GROUP BY, et j'ai seulement \'e9t\'e9 chercher l'ann\'e9e de publication pour chaque type spectral. L'une des plus grosses lacunes de MySQL est l'impossibilit\'e9 d'aller choisir toutes les colonnes o\'f9 une colonne sp\'e9cifique prend sa valeur maximale avec un GROUP BY, qu'on pourrait tenter d'effectuer avec cette commande:\
+\
+SELECT mad.designation, spt.moca_oid, spt.spectral_type, mp.moca_pid, MAX(mp.pubdate)\
+FROM mechanics_all_designations AS mad\
+INNER JOIN cdata_spectral_types AS spt USING(moca_oid)\
+INNER JOIN moca_publications AS mp ON(mp.moca_pid=spt.moca_pid)\
+WHERE designation LIKE "SIMP%"\
+GROUP BY mad.moca_oid;\
+\
+Bien que cette commande nous donnera l'ann\'e9e la plus r\'e9cente associ\'e9e aux types spectraux de chaque objet, il n'est pas garanti que la valeur du type spectral elle-m\'eame ne provienne pas d'une autre publication dans la requ\'eate! Pour rem\'e9dier \'e0 cette situation, nous sommes forc\'e9s de contourner le probl\'e8me avec un peu moins d'\'e9l\'e9gance, en construisant un genre de num\'e9ro de ligne (que nous nommerons sptrowid) pour les types spectraux de chaque objet individuellement, qui ira donc de 1 \'e0 N pour un objet avec N mesures de type spectral, tout en faisant attention \'e0 ordonner les publications des plus r\'e9centes aux plus anciennes. La commande suivante nous permettra d'obtenir sptrowid: ROW_NUMBER() OVER(PARTITION BY moca_oid ORDER BY mp.publication_date DESC) AS sptrowid. Ainsi;\
+\
+SELECT mad.designation, spt.moca_oid, spt.spectral_type, mp.moca_pid, mp.pubdate, ROW_NUMBER() OVER(PARTITION BY moca_oid ORDER BY mp.pubdate DESC) AS sptrowid\
+FROM mechanics_all_designations AS mad\
+INNER JOIN cdata_spectral_types AS spt USING(moca_oid)\
+INNER JOIN moca_publications AS mp ON(mp.moca_pid=spt.moca_pid)\
+WHERE designation LIKE "SIMP%";\
+\
+Ceci nous permettra ensuite de s\'e9lectionner seulement les lignes avec sptrowid=1, mais nous serons forc\'e9s d'appliquer ce filtre dans une deuxi\'e8me \'e9tape s\'e9par\'e9e, car MySQL ne nous permet pas de filtrer directement les valeurs sptrowid construites avec ROW_NUMBER() ON... (c'est une contrainte malheureuse de ce type de fonction qu'on appelle des "window functions). On peut appliquer le filtre avec la commande suivante:\
+\
+SELECT * FROM\
+(\
+SELECT mad.designation, spt.moca_oid, spt.spectral_type, mp.moca_pid, mp.pubdate, ROW_NUMBER() OVER(PARTITION BY moca_oid ORDER BY mp.pubdate DESC) AS sptrowid\
+FROM mechanics_all_designations AS mad\
+INNER JOIN cdata_spectral_types AS spt USING(moca_oid)\
+INNER JOIN moca_publications AS mp ON(mp.moca_pid=spt.moca_pid)\
+WHERE designation LIKE "SIMP%"\
+) AS subquery\
+WHERE sptrowid=1\
+\
+Remarquez que MySQL commence les identifiants de lignes par 1 et non z\'e9ro. De plus, MySQL nous force \'e0 assigner un surnom \'e0 toute table qui r\'e9sulte d'une requ\'eate nich\'e9e au sein d'une autre requ\'eate.\
+\
+On peut aussi utiliser la clause ORDER BY pour r\'e9ordonner les colonnes, par exemple si on veut les ordonner par types spectraux (on doit utiliser la colonne contenant le type spectral num\'e9rique pour le faire correctement):\
+\
+SELECT * FROM\
+(\
+SELECT mad.designation, spt.moca_oid, spt.spectral_type, mp.moca_pid, mp.pubdate, ROW_NUMBER() OVER(PARTITION BY moca_oid ORDER BY mp.pubdate DESC) AS sptrowid\
+FROM mechanics_all_designations AS mad\
+INNER JOIN cdata_spectral_types AS spt USING(moca_oid)\
+INNER JOIN moca_publications AS mp ON(mp.moca_pid=spt.moca_pid)\
+WHERE designation LIKE "SIMP%"\
+ORDER BY spt.spectral_type_number\
+) AS subquery\
+WHERE sptrowid=1\
+\
+Lorsqu'on utilise la commande INNER JOIN ou JOIN, MySQL ignorera toujours les lignes pour lesquelles aucune correspondance n'a \'e9t\'e9 trouv\'e9e dans la deuxi\'e8me table. Si on veut conserver les objets SIMP dont aucun type spectral n'est disponible, on peut opter pour l'utilisation d'un LEFT OUTER JOIN (ou LEFT JOIN pour abr\'e9ger):\
+\
+SELECT mad.designation, spt.moca_oid, spt.spectral_type\
+FROM mechanics_all_designations AS mad\
+LEFT JOIN cdata_spectral_types AS spt USING(moca_oid)\
+WHERE designation LIKE "SIMP%";\
+\
+On peut aussi utiliser cette syntaxe pour choisir sp\'e9cifiquement les entr\'e9es SIMP qui n'ont pas de type spectral:\
+\
+SELECT mad.designation, spt.moca_oid, spt.spectral_type\
+FROM mechanics_all_designations AS mad\
+LEFT JOIN cdata_spectral_types AS spt USING(moca_oid)\
+WHERE designation LIKE "SIMP%" AND spt.spectral_type IS NULL;\
+\
+On pourrait aussi ajouter toutes les mesures de mouvement propre disponibles:\
+\
+SELECT mad.designation, spt.moca_oid, spt.spectral_type, pm.pmra_masyr, pm.pmdec_masyr\
+FROM mechanics_all_designations AS mad\
+LEFT JOIN cdata_spectral_types AS spt USING(moca_oid)\
+LEFT JOIN data_proper_motions AS pm USING(moca_oid)\
+WHERE designation LIKE "SIMP%";\
+\
+Mais vous allez remarquer que certains de ces objets ont un grand nombre de mesures de mouvement propre. La base de donn\'e9es MOCAdb va p\'e9riodiquement choisir la valeur de mouvement propre la plus pr\'e9cise pour chaque \'e9toile, et lui assigner la valeur 1 dans la colonne "adopted". On peut ainsi choisir la meilleure valeur seulement avec:\
+\
+SELECT mad.designation, spt.moca_oid, spt.spectral_type, pm.pmra_masyr, pm.pmdec_masyr\
+FROM mechanics_all_designations AS mad\
+LEFT JOIN cdata_spectral_types AS spt USING(moca_oid)\
+LEFT JOIN data_proper_motions AS pm USING(moca_oid)\
+WHERE designation LIKE "SIMP%" AND pm.adopted=1;\
+\
+De fa\'e7on plut\'f4t contre intuitive, il est g\'e9n\'e9ralement beaucoup plus rapide de filtrer dans la clause "WHERE" \'e0 la fin de la requ\'eate, plut\'f4t que directement dans la clause "ON" lors de l'ajout de la table data_proper_motions, ou pire, qu'une sous-requ\'eate du type:\
+\
+SELECT mad.designation, spt.moca_oid, spt.spectral_type, pm.pmra_masyr, pm.pmdec_masyr\
+FROM mechanics_all_designations AS mad\
+LEFT JOIN cdata_spectral_types AS spt USING(moca_oid)\
+LEFT JOIN (SELECT * FROM data_proper_motions WHERE adopted=1) AS pm USING(moca_oid)\
+WHERE designation LIKE "SIMP%"\
+\
+Ceci est vrai parce que MySQL ne va pas n\'e9cessairement s'ex\'e9cuter dans l'ordre selon lequel nous avons list\'e9 les clauses; le language construira d'abord un plan d'action pour maximiser la performance, puis ex\'e9cutera seulement les \'e9tapes requises dans l'ordre le plus efficace qu'il puisse trouver. Lorsque des sous-requ\'eates sont nich\'e9es entre parenth\'e8ses, il est g\'e9n\'e9ralement beaucoup plus difficile pour MySQL d'interpr\'e9ter le code globalement et de trouver le meilleur plan d'ex\'e9cution.\
+\
+Dans une autre situation, on pourrait vouloir aller chercher une liste de toutes les \'e9toiles d'une association jeune. Prenons par exemple l'association cin\'e9matique AB Doradus, donc le moca_aid = 'ABDMG' comme on peut le voir \'e0 la table moca_associations. Plusieurs choix se pr\'e9sentent \'e0 nous pour dresser une telle liste. La m\'e9thode la plus simple serait de lancer une requ\'eate dans la table data_memberships, qui contient toutes les remarques de la litt\'e9rature par rapport aux membres d'ABDMG:\
+\
+SELECT *\
+FROM data_memberships\
+WHERE moca_aid='ABDMG';\
+\
+On peut aussi ordonner les r\'e9sultats par type d'appartenance, cat\'e9goris\'e9s dans la colonne moca_mtid (pour "membership type id"). Les types sont BF, HM, CM, LM, AM et R, respectivement pour "bona fide", "high likelihood candidate member", "candidate member", "low likelihood candidate member", "ambiguous member", et "rejected". Les membres bona fide ont g\'e9n\'e9ralement une cin\'e9matique 3D (UVW) compl\'e8te, et au moins un signe de jeunesse coh\'e9rent avec l'\'e2ge de l'association; les HM doivent encore accumuler une ou deux telles mesures mais tous les signes pointent vers un membre robuste, CM sont des candidats dont plusieurs informations sont encore manquantes, LM sont des candidats probl\'e9matiques, les AM sont ambigus entre deux associations jeunes, et R ont \'e9t\'e9 rejet\'e9s en tant que membres. Si on voulait simplement ordonner les r\'e9sultats selon ces cat\'e9gories, on n'obtiendrait pas un ordre tr\'e8s d\'e9sirable, car il serait simplement alphab\'e9tique:\
+\
+SELECT *\
+FROM data_memberships\
+WHERE moca_aid='ABDMG'\
+ORDER BY moca_mtid;\
+\
+On se retrouve avec les membres AM, BF, CM, HM, LM et enfin R. Il serait beaucoup plus int\'e9ressant de joindre la table moca_membership_types et d'ordonner selon la colonne "level" qui correspond mieux \'e0 un degr\'e9 de confiance:\
+\
+SELECT dm.*\
+FROM data_memberships dm\
+JOIN moca_membership_types mt USING(moca_mtid)\
+WHERE dm.moca_aid='ABDMG'\
+ORDER BY mt.level DESC;\
+\
+Vous remarquerez peut-\'eatre aussi qu'une seule \'e9toile pourrait avoir fait le sujet de plusieurs \'e9tudes ayant remarqu\'e9 qu'elle \'e9tant membre d'ABDMG. On peut mettre ceci encore plus en valeur en ordonnant par "level", puis ensuite par "moca_oid" pour chaque valeur de "level":\
+\
+SELECT dm.*\
+FROM data_memberships dm\
+JOIN moca_membership_types mt USING(moca_mtid)\
+WHERE dm.moca_aid='ABDMG'\
+ORDER BY mt.level DESC, dm.moca_oid;\
+\
+Pour obtenir une liste de membres sans r\'e9p\'e9titions, deux choix s'offrent \'e0 nous. Nous pourrions grouper par moca_oid, ainsi:\
+\
+SELECT dm.moca_oid, dm.moca_aid, GROUP_CONCAT(dm.moca_mtid) AS all_memtypes, GROUP_CONCAT(dm.moca_pid) AS all_publications\
+FROM data_memberships dm\
+WHERE dm.moca_aid='ABDMG'\
+GROUP BY dm.moca_oid;\
+\
+Cependant, en regroupant tous les "membership_types", nous perdons la possibilit\'e9 de s\'e9parer la table en membres "Bona fide", etc. de fa\'e7on claire. Ce probl\'e8me est difficile \'e0 r\'e9soudre, car une \'e9toile cat\'e9goris\'e9e comme "bona fide" dans une publication scientifique pourrait \'eatre cat\'e9goris\'e9e diff\'e9remment dans une autre ! Nous pourrions facilement retirer toutes les \'e9toiles qui ont \'e9t\'e9 rejet\'e9es au moins une fois de la fa\'e7on suivante:\
+\
+SELECT dm.moca_oid, dm.moca_aid, GROUP_CONCAT(dm.moca_mtid) AS all_memtypes, GROUP_CONCAT(dm.moca_pid) AS all_publications\
+FROM data_memberships dm\
+WHERE dm.moca_aid='ABDMG'\
+GROUP BY dm.moca_oid\
+HAVING all_memtypes NOT LIKE '%R%';\
+\
+Ici, la clause HAVING est tr\'e8s similaire \'e0 WHERE' mais elle s'applique apr\'e8s l'ex\'e9cution d'un GROUP BY, et nous devons donc l'utiliser si nous voulons filtrer en utilisant le r\'e9sultat d'un GROUP_CONCAT.\
+\
+Nous pourrions aussi aller chercher tous les membres qui ont \'e9t\'e9 appel\'e9s au moins une fois "Bona Fide", de la fa\'e7on suivante:\
+\
+SELECT dm.moca_oid, dm.moca_aid, GROUP_CONCAT(dm.moca_mtid) AS all_memtypes, GROUP_CONCAT(dm.moca_pid) AS all_publications\
+FROM data_memberships dm\
+WHERE dm.moca_aid='ABDMG'\
+GROUP BY dm.moca_oid\
+HAVING all_memtypes LIKE '%BF%' AND all_memtypes NOT LIKE '%R%';\
+\
+Nous pourrions aussi concat\'e9ner ces deux listes l'une apr\'e8s l'autre, en d\'e9finissant une nouvelle colonne pour les cat\'e9goriser, et en utilisant la clause UNION ALL pour combiner les lignes de deux requ\'eates en un seul tableau:\
+\
+SELECT "BF" AS category, dm.moca_oid, dm.moca_aid, GROUP_CONCAT(dm.moca_mtid) AS all_memtypes, GROUP_CONCAT(dm.moca_pid) AS all_publications\
+FROM data_memberships dm\
+WHERE dm.moca_aid='ABDMG'\
+GROUP BY dm.moca_oid\
+HAVING all_memtypes LIKE '%BF%' AND all_memtypes NOT LIKE '%R%'\
+\
+UNION ALL SELECT "HM" AS category, dm.moca_oid, dm.moca_aid, GROUP_CONCAT(dm.moca_mtid) AS all_memtypes, GROUP_CONCAT(dm.moca_pid) AS all_publications\
+FROM data_memberships dm\
+WHERE dm.moca_aid='ABDMG'\
+GROUP BY dm.moca_oid\
+HAVING all_memtypes LIKE '%HM%' AND all_memtypes NOT LIKE '%R%' AND all_memtypes NOT LIKE '%BF%'\
+\
+UNION ALL SELECT "CM" AS category, dm.moca_oid, dm.moca_aid, GROUP_CONCAT(dm.moca_mtid) AS all_memtypes, GROUP_CONCAT(dm.moca_pid) AS all_publications\
+FROM data_memberships dm\
+WHERE dm.moca_aid='ABDMG'\
+GROUP BY dm.moca_oid\
+HAVING all_memtypes NOT LIKE '%HM%' AND all_memtypes NOT LIKE '%BF%' AND all_memtypes NOT LIKE '%R%'\
+\
+UNION ALL SELECT "R" AS category, dm.moca_oid, dm.moca_aid, GROUP_CONCAT(dm.moca_mtid) AS all_memtypes, GROUP_CONCAT(dm.moca_pid) AS all_publications\
+FROM data_memberships dm\
+WHERE dm.moca_aid='ABDMG'\
+GROUP BY dm.moca_oid\
+HAVING all_memtypes LIKE '%R%';\
+\
+Une autre option qui s'offre \'e0 nous serait d'utiliser la table mechanics_best_memberships, qui contient seulement l'association la plus probable pour chaque \'e9toile.\
+\
+Parfois, une association jeune peut faire partie d'un regroupement d'associations plus grand. Par exemple, les associations Upper Scorpius (USCO), Lower Centaurus Crux (LCC) et Upper Centaurus Lupus (UCL) font ensemble partie de la r\'e9gion Scorpius-Centaurus (SCOCEN) tel qu'indiqu\'e9 dans la table moca_associations via la colonne parent_aid. Ainsi, une \'e9toile membre de USCO devrait par cons\'e9quent aussi se retrouver dans les membres de SCOCEN, et il peut devenir plus difficile de dresser une liste compl\'e8te de SCOCEN pour cette raison. La table mechanics_memberships_propagated est utile dans cette situation, car toutes les lignes reli\'e9es \'e0 USCO auront automatiquement \'e9t\'e9 aussi list\'e9es comme membres de SCOCEN par MOCAdb. On peut ainsi obtenir une liste compl\'e8te de SCOCEN avec:\
+\
+SELECT dm.moca_oid, dm.moca_aid, GROUP_CONCAT(dm.moca_mtid) AS all_memtypes, GROUP_CONCAT(dm.moca_pid) AS all_publications\
+FROM mechanics_memberships_propagated dm\
+WHERE dm.moca_aid='SCOCEN'\
+GROUP BY dm.moca_oid\
+HAVING all_memtypes NOT LIKE '%R%';\
+\
+Historiquement, cette r\'e9gion a \'e9t\'e9 beaucoup \'e9tudi\'e9e avant Gaia, et par cons\'e9quent elle contient un grand nombre de contaminants. On peut retirer plusieurs de ceux-ci en joignant la table calc_banyan_sigma, contenant les r\'e9sultats de l'analyse Bay\'e9sienne banyan_sigma, et en retirant simplement toutes les entr\'e9es dont la v\'e9locit\'e9 ne peut pas se trouver \'e0 moins de 3 km/s de l'association jeune qui lui corresponde le mieux. C'est une fa\'e7on tr\'e8s conservatrice pour enlever seulement les entr\'e9es tr\'e8s probl\'e9matiques. Lorsqu'on utilise la table calc_banyan_sigma, il faut sp\'e9cifier la version de l'algorithme, les donn\'e9es qui ont \'e9t\'e9 utilis\'e9es (avec ou sans vitesse radiale et parallaxe), ou bien simplement prendre la version la plus r\'e9cente qui inclut le plus de donn\'e9es disponibles en sp\'e9cifiant adopted=1:\
+\
+SELECT dm.moca_oid, dm.moca_aid, cbs.best_hyp, GROUP_CONCAT(dm.moca_mtid) AS all_memtypes, GROUP_CONCAT(dm.moca_pid) AS all_publications\
+FROM mechanics_memberships_propagated dm\
+JOIN calc_banyan_sigma cbs USING(moca_oid)\
+WHERE dm.moca_aid='SCOCEN' AND cbs.adopted=1 AND cbs.uvw_sep<=3\
+GROUP BY dm.moca_oid\
+HAVING all_memtypes NOT LIKE '%R%';\
+\
+On retrouve dans cette liste plusieurs \'e9toiles qui ont \'e9t\'e9 cat\'e9goris\'e9es dans des sous-groupes d'USCO, LCC, EPSC et ROPH, lesquelles font toutes aussi partie de SCOCEN, ce qui est bon signe.\
+\
+On peut aussi appliquer une autre s\'e9rie de coupures contenues dans la table data_rejected_membership_parameters, qui contient des limites en distance, position ou v\'e9locit\'e9s extr\'eamement conservatrices pour diff\'e9rences associations ou amas ouverts, permettant aussi de rapidement filtrer les \'e9toiles les plus probl\'e9matiques. Ceci a d\'e9j\'e0 \'e9t\'e9 fait automatiquement par MOCAdb dans les tables mechanics_memberships_vetted (une version filtr\'e9e de mechanics_memberships_propagated) et mechanics_best_memberships_vetted (une table similaire mais regroup\'e9e par objet via moca_oid).\
+\
+Supposons que nous voudrions maintenant ajouter notre meilleur estim\'e9 des vitesses radiales de ces objets. Nous pourrions simplement ajouter les donn\'e9es brutes de la litt\'e9rature avec un JOIN sur la table data_radial_velocities:\
+\
+SELECT dm.moca_oid, dm.moca_aid, cbs.best_hyp, drv.radial_velocity_kms, drv.radial_velocity_kms_unc, drv.moca_pid AS rv_ref, drv.n_measurements, GROUP_CONCAT(dm.moca_mtid) AS all_memtypes, GROUP_CONCAT(dm.moca_pid) AS all_publications\
+FROM mechanics_memberships_propagated dm\
+JOIN calc_banyan_sigma cbs USING(moca_oid)\
+JOIN data_radial_velocities drv USING(moca_oid)\
+WHERE dm.moca_aid='SCOCEN' AND cbs.adopted=1 AND cbs.uvw_sep<=3\
+GROUP BY dm.moca_oid\
+HAVING all_memtypes NOT LIKE '%R%';\
+\
+Cependant, certains objets se trouveront d\'e9cupl\'e9s lorsque plusieurs mesures de vitesse radiale sont disponibles, et la clause GROUP BY s\'e9lectionnera al\'e9atoirement l'une des vitesses radiales disponible. On peut opter de voir toutes les vitesses radiales en ajoutant data_radial_velocities apr\'e8s le GROUP BY, mais puisque ceci ne respecte pas l'ordre des clauses MySQL, il nous faut deux requ\'eates:\
+\
+SELECT drv.radial_velocity_kms, drv.radial_velocity_kms_unc, drv.moca_pid AS rv_ref, drv.n_measurements, subt.*\
+FROM \
+(\
+	SELECT dm.moca_oid, dm.moca_aid, cbs.best_hyp, GROUP_CONCAT(dm.moca_mtid) AS all_memtypes, GROUP_CONCAT(dm.moca_pid) AS all_publications\
+	FROM mechanics_memberships_propagated dm\
+	JOIN calc_banyan_sigma cbs USING(moca_oid)\
+	WHERE dm.moca_aid='SCOCEN' AND cbs.adopted=1 AND cbs.uvw_sep<=3\
+GROUP BY dm.moca_oid\
+	HAVING all_memtypes NOT LIKE '%R%'\
+) subt\
+JOIN data_radial_velocities drv USING(moca_oid)\
+\
+Cette fois-ci, on verra toutes les mesures de vitesse radiale de la litt\'e9rature. Remarquez que je n'aurais pas pu joindre avec moca_aid sur la sous-requ\'eate "subt" si je n'avais pas \'e9t\'e9 chercher la colonne moca_oid dans le SELECT interne.\
+\
+La vitesses radiales d'une \'e9toile peuvent varier consid\'e9rablement avec le temps si c'est une \'e9toile binaire, par exemple. Il pourrait donc \'eatre utile de combiner toutes les vitesses radiales de la litt\'e9rature, mais faire cela proprement n'est pas \'e9vident du tout, lorsque certaines vitesses radiales pourraient avoir \'e9t\'e9 pris \'e0 la m\'eame date, avec des incertitudes compl\'e8tement diff\'e9rentes, ou en combinant un diff\'e9rent nombre de mesures (tel qu'indiqu\'e9 par n_measurements). MOCAdb a en fait d\'e9j\'e0 automatiquement combin\'e9 toutes les vitesses radiales pour chaque moca_oid de fa\'e7on \'e0 obtenir un estim\'e9 le plus fiable possible de la vitesse m\'e9diane dans le temps, en tenant compte des barres d'erreur, de n_measurements, en regroupant les vitesses radiales prises \'e0 la m\'eame date dans un premier temps, en sp\'e9cifiant un plancher sur la pr\'e9cision des mesures de vitesse radiale absolue, et en \'e9vitant de combiner des mesures redondantes comme celles provenant de Gaia DR2 et DR3. Ces valeurs sont disponibles dans la table calc_radial_velocities_combined, et il serait donc plus int\'e9ressant d'utiliser cette table:\
+\
+SELECT dm.moca_oid, dm.moca_aid, cbs.best_hyp, drv.radial_velocity_kms, drv.radial_velocity_kms_unc, drv.all_pids AS rv_refs, drv.n_measurements, GROUP_CONCAT(dm.moca_mtid) AS all_memtypes, GROUP_CONCAT(dm.moca_pid) AS all_publications\
+FROM mechanics_memberships_propagated dm\
+JOIN calc_banyan_sigma cbs USING(moca_oid)\
+JOIN calc_radial_velocities_combined drv USING(moca_oid)\
+WHERE dm.moca_aid='SCOCEN' AND cbs.adopted=1 AND cbs.uvw_sep<=3\
+GROUP BY dm.moca_oid\
+HAVING all_memtypes NOT LIKE '%R%';\
+\
+On peut aussi utiliser la table calc_radial_velocities_corrected, qui inclut les corrections du redshift gravitationnel et du redshift convectif, appliqu\'e9es automatiquement par MOCAdb en utilisant les types spectraux des objets:\
+\
+SELECT dm.moca_oid, dm.moca_aid, cbs.best_hyp, drv.radial_velocity_kms, drv.radial_velocity_kms_unc, drv.all_pids AS rv_refs, drv.n_measurements, GROUP_CONCAT(dm.moca_mtid) AS all_memtypes, GROUP_CONCAT(dm.moca_pid) AS all_publications\
+FROM mechanics_memberships_propagated dm\
+JOIN calc_banyan_sigma cbs USING(moca_oid)\
+JOIN calc_radial_velocities_corrected drv USING(moca_oid)\
+WHERE dm.moca_aid='SCOCEN' AND cbs.adopted=1 AND cbs.uvw_sep<=3\
+GROUP BY dm.moca_oid\
+HAVING all_memtypes NOT LIKE '%R%';\
+\
+On pourrait m\'eame s'imaginer dresser une liste faire un suivi au t\'e9lescope, ce qui pourrait nous pousser \'e0 vouloir appliquer des coupures photom\'e9triques, qu'on peut faire soit directement en joignant des catalogues astrophysiques (par exemple cat_gaiadr3, ou cat_2mass) et en utilisant les colonnes appropri\'e9es, ou bien en utilisant la table cdata_photometry, qui contient les valeurs de photom\'e9trie de plusieurs catalogues, corrig\'e9es pour l'extinction due \'e0 la poussi\'e8re interstellaire. On peut consulter moca_photometry_systems pour choisir la magnitude d\'e9sir\'e9e (colonne moca_psid), par exemple gaiaedr3_gmag, la magnitude G du catalogue Gaia EDR3 (identique \'e0 Gaia DR3). Si on voudrait couper les objets avec G > 12 (et ignorer ceux sans magnitude Gaia), on ferait donc:\
+\
+SELECT dm.moca_oid, ROUND(phot.magnitude,1) AS gmag, dm.moca_aid, cbs.best_hyp, drv.radial_velocity_kms, drv.radial_velocity_kms_unc, drv.all_pids AS rv_refs, drv.n_measurements, GROUP_CONCAT(dm.moca_mtid) AS all_memtypes, GROUP_CONCAT(dm.moca_pid) AS all_publications\
+FROM mechanics_memberships_propagated dm\
+JOIN calc_banyan_sigma cbs USING(moca_oid)\
+JOIN calc_radial_velocities_corrected drv USING(moca_oid)\
+JOIN cdata_photometry phot USING(moca_oid)\
+WHERE dm.moca_aid='SCOCEN' AND cbs.adopted=1 AND cbs.uvw_sep<=3 AND phot.moca_psid='gaiaedr3_gmag' AND phot.magnitude<=12\
+GROUP BY dm.moca_oid\
+HAVING all_memtypes NOT LIKE '%R%';\
+\
+On pourrait aussi d\'e9cider de retirer tous les objets de type spectraux plus tardifs que K5, en utilisant la colonne spectral_type_number de la table cdata_spectral_types (les num\'e9ros de types spectraux sont z\'e9ro pour M0, -10 pour K0, +10 pour L0, etc., donc -5 pour K5):\
+\
+SELECT dm.moca_oid, spt.spectral_type, ROUND(phot.magnitude,1) AS gmag, dm.moca_aid, cbs.best_hyp, drv.radial_velocity_kms, drv.radial_velocity_kms_unc, drv.all_pids AS rv_refs, drv.n_measurements, GROUP_CONCAT(dm.moca_mtid) AS all_memtypes, GROUP_CONCAT(dm.moca_pid) AS all_publications\
+FROM mechanics_memberships_propagated dm\
+JOIN calc_banyan_sigma cbs USING(moca_oid)\
+JOIN calc_radial_velocities_corrected drv USING(moca_oid)\
+JOIN cdata_spectral_types spt USING(moca_oid)\
+JOIN cdata_photometry phot USING(moca_oid)\
+WHERE dm.moca_aid='SCOCEN' AND cbs.adopted=1 AND cbs.uvw_sep<=3 AND phot.moca_psid='gaiaedr3_gmag' AND phot.magnitude<=12 AND spt.adopted=1 AND spt.spectral_type_number < -5\
+GROUP BY dm.moca_oid\
+HAVING all_memtypes NOT LIKE '%R%';\
+\
+Remarquez que nous avons ici seulement utilis\'e9 les meilleurs types spectraux disponibles (adopted=1).\
+\
+On pourrait aussi rechercher seulement les objets n'\'e9tait pas trop pr\'e8s du p\'f4le Sud c\'e9leste avec une contrainte sur la d\'e9clinaison, par exemple si notre t\'e9lescope ne peut pas s'y rendre. On pourrait soit utiliser la table data_equatorial_coordinates qui contient toutes les coordonn\'e9es disponibles pour chaque \'e9toile, ou simplement les coordonn\'e9es approximatives catalogu\'e9es dans la table moca_objects, ainsi:\
+\
+SELECT dm.moca_oid, spt.spectral_type, ROUND(phot.magnitude,1) AS gmag, dm.moca_aid, cbs.best_hyp, drv.radial_velocity_kms, drv.radial_velocity_kms_unc, drv.all_pids AS rv_refs, drv.n_measurements, GROUP_CONCAT(dm.moca_mtid) AS all_memtypes, GROUP_CONCAT(dm.moca_pid) AS all_publications\
+FROM mechanics_memberships_propagated dm\
+JOIN moca_objects mo USING(moca_oid)\
+JOIN calc_banyan_sigma cbs USING(moca_oid)\
+JOIN calc_radial_velocities_corrected drv USING(moca_oid)\
+JOIN cdata_spectral_types spt USING(moca_oid)\
+JOIN cdata_photometry phot USING(moca_oid)\
+WHERE dm.moca_aid='SCOCEN' AND cbs.adopted=1 AND cbs.uvw_sep<=3 AND phot.moca_psid='gaiaedr3_gmag' AND phot.magnitude<=12 AND spt.adopted=1 AND spt.spectral_type_number < -5 AND mo.dec>-70\
+GROUP BY dm.moca_oid\
+HAVING all_memtypes NOT LIKE '%R%';\
+\
+Nous pourrions aussi \'eatre en train de dresser une liste d'\'e9toiles pour y rechercher des exoplan\'e8tes, et nous voudrions peut-\'eatre \'e9viter les \'e9toiles binaires. Il existe une multitude d'approches pour identifier les \'e9toiles binaires, plusieurs d'entre elles ayant d\'e9j\'e0 \'e9t\'e9 appliqu\'e9es manuellement ou automatiquement par MOCAdb dans la table data_object_properties. On peut donc ajouter une colonne dans notre liste d'\'e9toiles qui contiendra toutes les propri\'e9t\'e9s sp\'e9ciales identifi\'e9es dans la base de donn\'e9es:\
+\
+SELECT dm.moca_oid, GROUP_CONCAT(DISTINCT op.property_name) AS properties, spt.spectral_type, ROUND(phot.magnitude,1) AS gmag, dm.moca_aid, cbs.best_hyp, drv.radial_velocity_kms, drv.radial_velocity_kms_unc, drv.all_pids AS rv_refs, drv.n_measurements, GROUP_CONCAT(dm.moca_mtid) AS all_memtypes, GROUP_CONCAT(dm.moca_pid) AS all_publications\
+FROM mechanics_memberships_propagated dm\
+JOIN moca_objects mo USING(moca_oid)\
+JOIN calc_banyan_sigma cbs USING(moca_oid)\
+JOIN calc_radial_velocities_corrected drv USING(moca_oid)\
+JOIN cdata_spectral_types spt USING(moca_oid)\
+JOIN cdata_photometry phot USING(moca_oid)\
+LEFT JOIN data_object_properties op USING(moca_oid)\
+WHERE dm.moca_aid='SCOCEN' AND cbs.adopted=1 AND cbs.uvw_sep<=3 AND phot.moca_psid='gaiaedr3_gmag' AND phot.magnitude<=12 AND spt.adopted=1 AND spt.spectral_type_number < -5 AND mo.dec>-70\
+GROUP BY dm.moca_oid\
+HAVING all_memtypes NOT LIKE '%R%';\
+\
+Ici nous avons utilis\'e9 un LEFT JOIN, car nous ne voudrions pas ignorer les \'e9toiles sans propri\'e9t\'e9s sp\'e9ciales !\
+\
+On voit ici que plusieurs \'e9toiles sont des binaires non r\'e9solues, ou des binaires ordinaires, qu'on peut choisir d'ignorer via la clause HAVING (car ici on filtre sur un r\'e9sultat du GROUP BY):\
+\
+SELECT dm.moca_oid, GROUP_CONCAT(DISTINCT op.property_name) AS properties, spt.spectral_type, ROUND(phot.magnitude,1) AS gmag, dm.moca_aid, cbs.best_hyp, drv.radial_velocity_kms, drv.radial_velocity_kms_unc, drv.all_pids AS rv_refs, drv.n_measurements, GROUP_CONCAT(dm.moca_mtid) AS all_memtypes, GROUP_CONCAT(dm.moca_pid) AS all_publications\
+FROM mechanics_memberships_propagated dm\
+JOIN moca_objects mo USING(moca_oid)\
+JOIN calc_banyan_sigma cbs USING(moca_oid)\
+JOIN calc_radial_velocities_corrected drv USING(moca_oid)\
+JOIN cdata_spectral_types spt USING(moca_oid)\
+JOIN cdata_photometry phot USING(moca_oid)\
+LEFT JOIN data_object_properties op USING(moca_oid)\
+WHERE dm.moca_aid='SCOCEN' AND cbs.adopted=1 AND cbs.uvw_sep<=3 AND phot.moca_psid='gaiaedr3_gmag' AND phot.magnitude<=12 AND spt.adopted=1 AND spt.spectral_type_number < -5 AND mo.dec>-70\
+GROUP BY dm.moca_oid\
+HAVING all_memtypes NOT LIKE '%R%' AND properties NOT LIKE '%binary%';\
+\
+Remarquez ici qu'on se retrouve \'e0 avoir \'e9limin\'e9 toutes les entr\'e9es avec properties = NULL. C'est une caract\'e9ristique un peu surprenante de MySQL au d\'e9but; n'importe quelle crit\'e8re bool\'e9en va rejeter les valeurs NULL. Nous devons donc explicitement les r\'e9inclure avec un OR:\
+\
+SELECT dm.moca_oid, GROUP_CONCAT(DISTINCT op.property_name) AS properties, spt.spectral_type, ROUND(phot.magnitude,1) AS gmag, dm.moca_aid, cbs.best_hyp, drv.radial_velocity_kms, drv.radial_velocity_kms_unc, drv.all_pids AS rv_refs, drv.n_measurements, GROUP_CONCAT(dm.moca_mtid) AS all_memtypes, GROUP_CONCAT(dm.moca_pid) AS all_publications\
+FROM mechanics_memberships_propagated dm\
+JOIN moca_objects mo USING(moca_oid)\
+JOIN calc_banyan_sigma cbs USING(moca_oid)\
+JOIN calc_radial_velocities_corrected drv USING(moca_oid)\
+JOIN cdata_spectral_types spt USING(moca_oid)\
+JOIN cdata_photometry phot USING(moca_oid)\
+LEFT JOIN data_object_properties op USING(moca_oid)\
+WHERE dm.moca_aid='SCOCEN' AND cbs.adopted=1 AND cbs.uvw_sep<=3 AND phot.moca_psid='gaiaedr3_gmag' AND phot.magnitude<=12 AND spt.adopted=1 AND spt.spectral_type_number < -5 AND mo.dec>-70\
+GROUP BY dm.moca_oid\
+HAVING all_memtypes NOT LIKE '%R%' AND (properties NOT LIKE '%binary%' OR properties IS NULL);\
+\
+On pourrait aussi vouloir poser des contraintes sur l'activit\'e9 stellaire de notre \'e9chantillon, ce qui peut se faire avec certains indices spectraux comme le log_rprime_rhk d\'e9crit dans la table mcoa_spectral_indices et donc les valeurs sont disponibles dans data_spectral_indices. On peut donc aller chercher la valeur moyenne de log_rhk par \'e9toile, lorsqu'elle est disponible:\
+\
+SELECT AVG(dsi.index_value) AS logrhkmean, dm.moca_oid, GROUP_CONCAT(DISTINCT op.property_name) AS properties, spt.spectral_type, ROUND(phot.magnitude,1) AS gmag, dm.moca_aid, cbs.best_hyp, drv.radial_velocity_kms, drv.radial_velocity_kms_unc, drv.all_pids AS rv_refs, drv.n_measurements, GROUP_CONCAT(dm.moca_mtid) AS all_memtypes, GROUP_CONCAT(dm.moca_pid) AS all_publications\
+FROM mechanics_memberships_propagated dm\
+JOIN moca_objects mo USING(moca_oid)\
+JOIN calc_banyan_sigma cbs USING(moca_oid)\
+JOIN calc_radial_velocities_corrected drv USING(moca_oid)\
+JOIN cdata_spectral_types spt USING(moca_oid)\
+JOIN cdata_photometry phot USING(moca_oid)\
+LEFT JOIN data_object_properties op USING(moca_oid)\
+LEFT JOIN data_spectral_indices dsi USING(moca_oid)\
+WHERE dm.moca_aid='SCOCEN' AND cbs.adopted=1 AND cbs.uvw_sep<=3 AND phot.moca_psid='gaiaedr3_gmag' AND phot.magnitude<=12 AND spt.adopted=1 AND spt.spectral_type_number < -5 AND mo.dec>-70 AND (dsi.moca_siid='log_rprime_hk' OR dsi.moca_siid IS NULL)\
+GROUP BY dm.moca_oid\
+HAVING all_memtypes NOT LIKE '%R%' AND (properties NOT LIKE '%binary%' OR properties IS NULL);\
+\
+On pourrait ensuite ajouter des contraintes sur logrhkmean dans la clause HAVING.\
+\
+Supposons que nous voudrions maintenant cr\'e9er une nouvelle table avec la requ\'eate ci-haut pour effectuer d'autres op\'e9rations sur celles-ci. Les utilsateurs MOCAdb n'ont pas la permission de cr\'e9er de nouvelles tables permanentes, mais des tables temporaires peuvent \'eatre ajout\'e9es, qui ne seront pas list\'e9es \'e0 gauche par Sequel Ace, et qui dispara\'eetront aussit\'f4t que vous vous d\'e9connecterez. Dans MySQL, on doit malheureusement premi\'e8rement pr\'e9parer les colonnes de la table temporaire ainsi:\
+\
+DROP TEMPORARY TABLE IF EXISTS tmp_targets;\
+CREATE TEMPORARY TABLE tmp_targets (logrhkmean FLOAT, moca_oid INT, properties TEXT, spectral_type TEXT, gmag FLOAT, moca_aid TEXT, best_hyp TEXT, radial_velocity_kms FLOAT, radial_velocity_kms_unc FLOAT, rv_refs TEXT, n_measurements INT, all_membtypes TEXT, all_publications TEXT);\
+\
+Puis ensuite on peut ins\'e9rer le r\'e9sultat de notre requ\'eate dans cette table:\
+\
+INSERT INTO tmp_targets\
+SELECT AVG(dsi.index_value) AS logrhkmean, dm.moca_oid, GROUP_CONCAT(DISTINCT op.property_name) AS properties, spt.spectral_type, ROUND(phot.magnitude,1) AS gmag, dm.moca_aid, cbs.best_hyp, drv.radial_velocity_kms, drv.radial_velocity_kms_unc, drv.all_pids AS rv_refs, drv.n_measurements, GROUP_CONCAT(dm.moca_mtid) AS all_memtypes, GROUP_CONCAT(dm.moca_pid) AS all_publications\
+FROM mechanics_memberships_propagated dm\
+JOIN moca_objects mo USING(moca_oid)\
+JOIN calc_banyan_sigma cbs USING(moca_oid)\
+JOIN calc_radial_velocities_corrected drv USING(moca_oid)\
+JOIN cdata_spectral_types spt USING(moca_oid)\
+JOIN cdata_photometry phot USING(moca_oid)\
+LEFT JOIN data_object_properties op USING(moca_oid)\
+LEFT JOIN data_spectral_indices dsi USING(moca_oid)\
+WHERE dm.moca_aid='SCOCEN' AND cbs.adopted=1 AND cbs.uvw_sep<=3 AND phot.moca_psid='gaiaedr3_gmag' AND phot.magnitude<=12 AND spt.adopted=1 AND spt.spectral_type_number < -5 AND mo.dec>-70 AND (dsi.moca_siid='log_rprime_hk' OR dsi.moca_siid IS NULL)\
+GROUP BY dm.moca_oid\
+HAVING all_memtypes NOT LIKE '%R%' AND (properties NOT LIKE '%binary%' OR properties IS NULL);\
+\
+Ensuite on peut consulter la nouvelle table r\'e9sultante avec:\
+\
+SELECT * FROM tmp_targets;\
+\
+Et l'utiliser dans d'autres requ\'eates par la suite.\
+\
+Cette fonction peut \'eatre utile pour ins\'e9rer sa propre liste d'objets (par exemple via pandas en Python) dans une table temporaire, pour ensuite la joindre \'e0 n'importe quelle table de la base de donn\'e9es.\
+\
+}
