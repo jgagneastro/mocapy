@@ -13,7 +13,7 @@ from setuptools import find_packages, setup
 
 NAME = "mocapy"
 PACKAGES = find_packages(where="src")
-META_PATH = os.path.join("src", "mocapy", "__init__.py", "__main__.py")
+META_PATH = os.path.join("src", "mocapy", "__init__.py")
 CLASSIFIERS = [
     "Development Status :: 3 - Alpha",
     "Intended Audience :: Developers",
