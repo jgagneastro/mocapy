@@ -5,8 +5,8 @@ mocapy
 
 mocapy is still under development, and allows users to connect to the MOCA database, run raw SQL queries and obtain the resulting data in the form of a pandas DataFrame.
 
-You can install this package with the following command::
-    pip install git+https://github.com/jgagneastro/mocapy.git
+You can install this package with the following command:
+	pip install git+https://github.com/jgagneastro/mocapy.git
 
 
 Documentation
