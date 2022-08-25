@@ -13,13 +13,27 @@ Documentation
 
 The full documentation for this project is not yet available.
 
-License
--------
+The following Python command lines will allow you to download data from the MOCA database using raw MySQL syntax::
+    
+    #Import the mocapy package
+    from mocapy import *
 
-Copyright 2022 Jonathan Gagne.
+    #Create a moca engine object
+    moca = MocaEngine()
+    
+    #Query the moca database to obtain a Pandas DataFrame
+    df = moca.query("SELECT * FROM moca_objects LIMIT 20")
+    
+    #See the outputs of the DataFrame
+    print(df)
 
-mocapy is free software made available under the MIT License. For details see
-the LICENSE file.
+You can also upload your own table to the database (as a temporary table) and use it to cross-match any database entries. In this example, we will use the previous df DataFrame which we downloaded from MOCAdb, but you could use any dataframe::
+
+    #Query the moca database again, but this time upload your own pandas DataFrame to cross-match against the database
+    dfnew = moca.query("SELECT * FROM cdata_spectral_types JOIN tmp_table USING(moca_oid)",tmp_table=df)
+    
+    #See the outputs of the second DataFrame
+    print(dfnew)
 
 More details about MOCA
 -----------------------
@@ -485,3 +499,11 @@ Ensuite on peut consulter la nouvelle table résultante avec::
 Et l'utiliser dans d'autres requêtes par la suite.
 
 Cette fonction peut être utile pour insérer sa propre liste d'objets (par exemple via pandas en Python) dans une table temporaire, pour ensuite la joindre à n'importe quelle table de la base de données.
+
+License
+-------
+
+Copyright 2022 Jonathan Gagne.
+
+mocapy is free software made available under the MIT License. For details see
+the LICENSE file.
