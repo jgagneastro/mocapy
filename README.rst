@@ -5,6 +5,9 @@ mocapy
 
 mocapy is still under development, and allows users to connect to the MOCA database, run raw SQL queries and obtain the resulting data in the form of a pandas DataFrame.
 
+You can install this package with the following command::
+	pip install git+https://github.com/jgagneastro/mocapy.git
+
 Documentation
 -------------
 
@@ -17,8 +20,6 @@ Copyright 2022 Jonathan Gagne.
 
 mocapy is free software made available under the MIT License. For details see
 the LICENSE file.
-
-You can install this package with pip install git+https://github.com/jgagneastro/mocapy.git
 
 More details about MOCA
 -----------------------
