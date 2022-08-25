@@ -23,3 +23,5 @@ emcee_version.py
 env
 .eggs
 .coverage.*
+
+__pycache__
