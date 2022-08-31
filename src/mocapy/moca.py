@@ -4,6 +4,7 @@ import pandas as pd
 import numpy as np
 from urllib.parse import quote_plus as urlquote #This is useful to avoid problems with special characters in passwords
 import os
+import uuid
 
 __author__ = 'Jonathan Gagne'
 __email__ = 'jonathan.gagne@astro.umontreal.ca'
@@ -62,47 +63,107 @@ class MocaEngine:
 		else:
 			self.moca_host = default_host
 
-		#Prepare the database connection
+		#Prepare the database engine
+		print('mysql+pymysql://'+self.moca_username+':'+urlquote(self.moca_password)+'@'+self.moca_host+'/'+self.moca_dbname)
+		#.replace('@','%40').replace('%21','$')
 		self.engine = create_engine('mysql+pymysql://'+self.moca_username+':'+urlquote(self.moca_password)+'@'+self.moca_host+'/'+self.moca_dbname)
+
+		#By default mocapy has no active connection
+		self.connection = None
+		#self.tmptablename = 'tmp_table_'+str(uuid.uuid4()).replace('-','')
 
 	def query(self,sql_query,tmp_table=None):
 		
-		#Connect to the database and run the SQL query
+		#Connect to the database if needed, and run the SQL query
 		df = None
-		with self.engine.connect() as connection:
-			
-			#Upload a temporary table if needed
-			if tmp_table is not None:
-				
-				#Verify that the temporary table is a DataFrame
-				assert isinstance(tmp_table,pd.DataFrame), "The temporary table tmp_table passed to MocaEngine.query() must be a pandas DataFrame"
-
-				pandas_engine = pandasSQL_builder(connection)
-
-				#Create a tenporary table
-				table = TemporaryTable("tmp_table", pandas_engine, frame=tmp_table, if_exists="append")
-				table.create()
-				
-				#Insert records in temporary table
-				sql_engine = get_engine("auto")
-				total_inserted = sql_engine.insert_records(table=table,con=connection,frame=tmp_table,name="tmp_table")			          
-				
-				#Testing that the temporary table exists
-				#d2 = pd.read_sql("SELECT * FROM tmp_table;",connection)
-				#print(d2)
-
-
-			#Execute the query
-			df = pd.read_sql(sql_query, connection)
+		if self.connection is not None:
+			print(' Using a SQL connection maintained outside of the mocapy package')
+			active_connection=self.connection
 		
+		if self.connection is None:
+			active_connection=self.engine.connect()
+
+		#with self.engine.connect() as connection:
+			
+		#Upload a temporary table if needed
+		if tmp_table is not None:
+			
+			#Determine a temporary table name for the database
+			tmptablename = 'tmp_table_'+str(uuid.uuid4()).replace('-','')
+
+			#Verify that the temporary table is a DataFrame
+			assert isinstance(tmp_table,pd.DataFrame), "The temporary table tmp_table passed to MocaEngine.query() must be a pandas DataFrame"
+
+			pandas_engine = pandasSQL_builder(active_connection)
+
+			#Create a tenporary table
+			table = TemporaryTable(tmptablename, pandas_engine, frame=tmp_table, if_exists="append")
+			table.create()
+				
+			#Insert records in temporary table
+			sql_engine = get_engine("auto")
+			total_inserted = sql_engine.insert_records(table=table,con=active_connection,frame=tmp_table,name=tmptablename)
+			
+			sql_query = sql_query.replace('tmp_table',tmptablename)
+			#Testing that the temporary table exists
+			#d2 = pd.read_sql("SELECT * FROM tmp_table;",active_connection)
+			#print(d2)
+
+
+		#Execute the query
+		df = pd.read_sql(sql_query, active_connection)
+		
+		#Close the connection unless it is maintained outside of this method
+		if self.connection is None:
+			active_connection.close()
+
 		return(df)
 
 	#This generally requires admin privileges
-	def execute(self,sql_query):
+	def execute(self,sql_query,tmp_table=None):
 		
+		#Connect to the database if needed, and run the SQL query
+		if self.connection is not None:
+			print(' Using a SQL connection maintained outside of the mocapy package')
+			active_connection=self.connection
+		
+		if self.connection is None:
+			active_connection=self.engine.connect()
+
+		#Upload a temporary table if needed
+		if tmp_table is not None:
+			
+			#Determine a temporary table name for the database
+			tmptablename = 'tmp_table_'+str(uuid.uuid4()).replace('-','')
+
+			#Verify that the temporary table is a DataFrame
+			assert isinstance(tmp_table,pd.DataFrame), "The temporary table tmp_table passed to MocaEngine.query() must be a pandas DataFrame"
+
+			pandas_engine = pandasSQL_builder(active_connection)
+
+			#Create a tenporary table
+			table = TemporaryTable(tmptablename, pandas_engine, frame=tmp_table, if_exists="append")
+			table.create()
+				
+			#Insert records in temporary table
+			sql_engine = get_engine("auto")
+			total_inserted = sql_engine.insert_records(table=table,con=active_connection,frame=tmp_table,name=tmptablename)
+
+			sql_query = sql_query.replace('tmp_table',tmptablename)
+
 		#Connect to the database and run the SQL execution statement
-		with self.engine.connect() as connection:
-			rs = connection.execute(sql_query)
+		#with self.engine.connect() as connection:
+		
+		#Split individual query into an array of queries
+		queries = sql_query.split(';')
+		for subq in queries:
+			if subq.strip() == '':
+				continue
+			rs = active_connection.execute(subq.strip()+';')
+
+		#Close the connection unless it is maintained outside of this method
+		if self.connection is None:
+			active_connection.close()
 		
 		return(rs)
 

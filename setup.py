@@ -22,7 +22,7 @@ CLASSIFIERS = [
     "Operating System :: OS Independent",
     "Programming Language :: Python",
 ]
-INSTALL_REQUIRES = ["numpy","pandas","sqlalchemy","pymysql"]
+INSTALL_REQUIRES = ["numpy","pandas","sqlalchemy","pymysql","uuid"]
 SETUP_REQUIRES = [
     "setuptools>=40.6.0",
     "setuptools_scm",
