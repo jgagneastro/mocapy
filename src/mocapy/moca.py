@@ -64,7 +64,7 @@ class MocaEngine:
 			self.moca_host = default_host
 
 		#Prepare the database engine
-		print('mysql+pymysql://'+self.moca_username+':'+urlquote(self.moca_password)+'@'+self.moca_host+'/'+self.moca_dbname)
+		#print('mysql+pymysql://'+self.moca_username+':'+urlquote(self.moca_password)+'@'+self.moca_host+'/'+self.moca_dbname)
 		#.replace('@','%40').replace('%21','$')
 		self.engine = create_engine('mysql+pymysql://'+self.moca_username+':'+urlquote(self.moca_password)+'@'+self.moca_host+'/'+self.moca_dbname)
 
@@ -162,6 +162,8 @@ class MocaEngine:
 			rs = active_connection.execute(subq.strip()+';')
 
 		#Close the connection unless it is maintained outside of this method
+		print("TEST")
+		active_connection.commit()
 		if self.connection is None:
 			active_connection.close()
 		
