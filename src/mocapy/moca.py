@@ -195,6 +195,6 @@ class MocaEngine:
 		if self.raw_connection is None:
 			active_connection.close()
 		
-		return(rs[0].fetchall())
+		return("Done")
 
 #import pdb; pdb.set_trace()
