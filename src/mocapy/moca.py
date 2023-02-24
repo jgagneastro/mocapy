@@ -170,7 +170,6 @@ class MocaEngine:
 			rs = active_connection.execute(subq.strip()+';')
 
 		#Close the connection unless it is maintained outside of this method
-		print("TEST")
 		active_connection.commit()
 		if self.connection is None:
 			active_connection.close()
@@ -196,6 +195,6 @@ class MocaEngine:
 		if self.raw_connection is None:
 			active_connection.close()
 		
-		return(rs.fetchall())
+		return(rs[0].fetchall())
 
 #import pdb; pdb.set_trace()
