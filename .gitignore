@@ -24,4 +24,6 @@ env
 .eggs
 .coverage.*
 
+mocapy-env/
+
 __pycache__

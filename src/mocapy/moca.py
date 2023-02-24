@@ -1,4 +1,9 @@
 #Import packages
+
+# Create environment
+#python -m venv mocapy-env
+#source mocapy-env/bin/activate
+
 from sqlalchemy import create_engine
 import pandas as pd
 import numpy as np
