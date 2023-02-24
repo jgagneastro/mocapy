@@ -75,6 +75,9 @@ class MocaEngine:
 
 		#By default mocapy has no active connection
 		self.connection = None
+
+		#By default mocapy has no active raw connection
+		self.raw_connection = None
 		#self.tmptablename = 'tmp_table_'+str(uuid.uuid4()).replace('-','')
 
 	def query(self,sql_query,tmp_table=None):
@@ -173,5 +176,26 @@ class MocaEngine:
 			active_connection.close()
 		
 		return(rs)
+
+	#This generally requires admin privileges
+	def call(self,sql_procedure):
+		
+		#Connect to the database if needed, and run the SQL query
+		#CALL requires a raw connection
+		if self.raw_connection is not None:
+			print(' Using a SQL raw_connection maintained outside of the mocapy package')
+			active_connection=self.raw_connection
+		
+		if self.connection is None:
+			active_connection=self.engine.raw_connection()
+		
+		cursor = active_connection.cursor()
+		rs = cursor.callproc(sql_procedure)
+		#This obscure step is required for changes to be reflected in the DB
+		active_connection.commit()
+		if self.raw_connection is None:
+			active_connection.close()
+		
+		return(rs.fetchall())
 
 #import pdb; pdb.set_trace()
