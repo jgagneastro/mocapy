@@ -1,0 +1,10 @@
+greenlet==2.0.2
+mocapy==0.1.dev16+gcffd2ea
+numpy==1.23.3
+pandas==1.4.3
+PyMySQL==1.0.2
+python-dateutil==2.8.2
+pytz==2022.7.1
+six==1.16.0
+SQLAlchemy==1.4.41
+uuid==1.30
