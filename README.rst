@@ -84,6 +84,7 @@ You should get an output similar to this::
     
     [4 rows x 191 columns]
 
+In this example, the last two stars did not have a match in the MOCA database, and thus the pandas DataFrame contains missing values.
 
 More details about MOCA
 -----------------------
