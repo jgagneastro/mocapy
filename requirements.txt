@@ -1,5 +1,4 @@
 greenlet==2.0.2
-mocapy==0.1.dev16+gcffd2ea
 numpy==1.23.3
 pandas==1.4.3
 PyMySQL==1.0.2

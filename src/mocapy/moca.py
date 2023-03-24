@@ -170,7 +170,7 @@ class MocaEngine:
 			rs = active_connection.execute(subq.strip()+';')
 
 		#Close the connection unless it is maintained outside of this method
-		active_connection.commit()
+		#active_connection.commit()#This appears to generate an error ?
 		if self.connection is None:
 			active_connection.close()
 		
