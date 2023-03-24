@@ -7,6 +7,23 @@ You can install this package with the following command::
 
     pip install git+https://github.com/jgagneastro/mocapy.git
 
+One the package is installed, it is *imperative* to create a Python environment dedicated to its use, and install the exact versions of the packages that were used in its development. This is true because several Python packages will change over time in a non-retrocompatible way.
+
+In order to create your own Python environment, open a terminal, navigate somewhere you will remember (e.g. your mocapy directory), and enter the following command:
+
+	python -m venv mocapy_env
+
+This will create a mocapy_env directory where the exact versions of the Python packages required by mocapy will be stored without interfering with your system installations. Once this is done, you need to activate this virtual environment with the follwing terminal command:
+
+	source mocapy_env/bin/activate
+
+Once this is done, you should see that your command line now stars with the "(mocapy_env) " flag before the usual prompts. Once you are located in this environment, you need to install all packages with the following command (here I am assuming you have navigated to the mocapy directory):
+
+	pip install -r requirements.txt
+
+Once the packages are installed, you should be able to launch Python and use mocapy normally. Note every time you need to use mocapy, you should launch the same mocapy Python environment, by navigating wherever you have created it, and launching the same command again:
+
+	source mocapy_env/bin/activate
 
 Documentation
 -------------
