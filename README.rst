@@ -63,7 +63,7 @@ If you would like to use your own list of stellar designations, we have provided
     
     # Locate the file with the stellar designations
     # Make sure the first line here has the word "designation" to indicate the column containing the stellar designations
-    file = "/Users/jonathan/Documents/Python/Python_Library/sandbox/star_designations.csv"
+    file = "/mocapy/docs/star_designations.csv"
     
     # Read the list of designations in a pandas DataFrame
     df = pd.read_csv(file)
