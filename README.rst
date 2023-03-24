@@ -52,6 +52,39 @@ You can also upload your own table to the database (as a temporary table) and us
     #See the outputs of the second DataFrame
     print(dfnew)
 
+If you would like to use your own list of stellar designations, we have provided an example file in /docs/star_designations.csv, which you can use with the following example::
+
+    # Import the necessary packages
+    from mocapy import *
+    import pandas as pd
+    
+    # Initiate a connection to the MOCA database
+    moca = MocaEngine()
+    
+    # Locate the file with the stellar designations
+    # Make sure the first line here has the word "designation" to indicate the column containing the stellar designations
+    file = "/Users/jonathan/Documents/Python/Python_Library/sandbox/star_designations.csv"
+    
+    # Read the list of designations in a pandas DataFrame
+    df = pd.read_csv(file)
+    
+    # Launch a query to MOCA joining the table "mechanics_all_designations" on your own list of stellar designations upon exact but case-insensitive matches (using the LIKE MySQL statement) in order to resolve the MOCA_OID unique identifiers, and use these moca_oid to join the summary_all_objects table containing best membership and other useful informations
+    mdf = moca.query("SELECT tt.designation AS input_designation, sam.* FROM tmp_table AS tt LEFT JOIN mechanics_all_designations AS mad ON(mad.designation LIKE tt.designation) LEFT JOIN summary_all_objects AS sam ON(sam.moca_oid=mad.moca_oid)", tmp_table=df)
+    
+    # Display mdf summary
+    mdf
+
+You should get an output similar to this::
+
+    input_designation  moca_oid moca_aid moca_mtid  ...    gaiadr3_source_id                                   all_designations                                    designation_url  mtid_level
+    0            AU Mic   10946.0     BPMG         BF  ...  6794047652729201024  MCC 824|Gaia EDR3 6794047652729201024|TYC 7457...  <a href=https://mocadb.ca/search/results?searc...         0.0
+    1            HD 952  501711.0     None      None  ...  2863577296085970816  Gaia EDR3 2863577296085970816|TIC 365934195|2M...  <a href=https://mocadb.ca/search/results?searc...         NaN
+    2    Barnard's Star       NaN     None      None  ...                 None                                               None                                               None         NaN
+    3            HIP 12       NaN     None      None  ...                 None                                               None                                               None         NaN
+    
+    [4 rows x 191 columns]
+
+
 More details about MOCA
 -----------------------
 
