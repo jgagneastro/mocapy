@@ -175,6 +175,7 @@ class MocaEngine:
 			if subq.strip() == '':
 				continue
 			rs = active_connection.execute(subq.strip()+';')
+			import pdb; pdb.set_trace()
 
 		#Close the connection unless it is maintained outside of this method
 		#active_connection.commit()#This appears to generate an error ?
