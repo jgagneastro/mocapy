@@ -109,7 +109,7 @@ class MocaEngine:
 			self.execute("DROP TEMPORARY TABLE IF EXISTS "+tmptablename)
 
 			#Create a temporary table
-			table = TemporaryTable(tmptablename, pandas_engine, frame=tmp_table, if_exists="append")
+			table = TemporaryTable(tmptablename, pandas_engine, frame=tmp_table, if_exists="append", index=False)
 			table.create()
 				
 			#Insert records in temporary table
@@ -157,7 +157,7 @@ class MocaEngine:
 			self.execute("DROP TEMPORARY TABLE IF EXISTS "+tmptablename)
 
 			#Create a temporary table
-			table = TemporaryTable(tmptablename, pandas_engine, frame=tmp_table, if_exists="append")
+			table = TemporaryTable(tmptablename, pandas_engine, frame=tmp_table, if_exists="append", index=False)
 			table.create()
 				
 			#Insert records in temporary table
