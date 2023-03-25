@@ -97,7 +97,8 @@ class MocaEngine:
 		if tmp_table is not None:
 			
 			#Determine a temporary table name for the database
-			tmptablename = 'tmp_table_'+str(uuid.uuid4()).replace('-','')
+			#tmptablename = 'tmp_table_'+str(uuid.uuid4()).replace('-','')
+			tmptablename = 'tmp_table'
 
 			#Verify that the temporary table is a DataFrame
 			assert isinstance(tmp_table,pd.DataFrame), "The temporary table tmp_table passed to MocaEngine.query() must be a pandas DataFrame"
@@ -112,7 +113,7 @@ class MocaEngine:
 			sql_engine = get_engine("auto")
 			total_inserted = sql_engine.insert_records(table=table,con=active_connection,frame=tmp_table,name=tmptablename)
 			
-			sql_query = sql_query.replace('tmp_table',tmptablename)
+			#sql_query = sql_query.replace('tmp_table',tmptablename)
 			#Testing that the temporary table exists
 			#d2 = pd.read_sql("SELECT * FROM tmp_table;",active_connection)
 			#print(d2)
