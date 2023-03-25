@@ -4,7 +4,7 @@
 #python -m venv mocapy-env
 #source mocapy-env/bin/activate
 
-from sqlalchemy import create_engine
+from sqlalchemy import create_engine, text
 import pandas as pd
 import numpy as np
 from urllib.parse import quote_plus as urlquote #This is useful to avoid problems with special characters in passwords
@@ -174,7 +174,7 @@ class MocaEngine:
 		for subq in queries:
 			if subq.strip() == '':
 				continue
-			rs = active_connection.execute(subq.strip()+';')
+			rs = active_connection.execute(text(subq.strip()+';'))
 
 		#Close the connection unless it is maintained outside of this method
 		#active_connection.commit()#This appears to generate an error ?
