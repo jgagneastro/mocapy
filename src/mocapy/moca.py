@@ -71,7 +71,7 @@ class MocaEngine:
 		#Prepare the database engine
 		#print('mysql+pymysql://'+self.moca_username+':'+urlquote(self.moca_password)+'@'+self.moca_host+'/'+self.moca_dbname)
 		#.replace('@','%40').replace('%21','$')
-		self.engine = create_engine('mysql+pymysql://'+self.moca_username+':'+urlquote(self.moca_password)+'@'+self.moca_host+'/'+self.moca_dbname)
+		self.engine = create_engine('mysql+pymysql://'+self.moca_username+':'+urlquote(self.moca_password)+'@'+self.moca_host+'/'+self.moca_dbname,future=True)
 
 		#By default mocapy has no active connection
 		self.connection = None
@@ -175,7 +175,6 @@ class MocaEngine:
 			if subq.strip() == '':
 				continue
 			rs = active_connection.execute(subq.strip()+';')
-			import pdb; pdb.set_trace()
 
 		#Close the connection unless it is maintained outside of this method
 		#active_connection.commit()#This appears to generate an error ?
