@@ -106,7 +106,7 @@ class MocaEngine:
 			pandas_engine = pandasSQL_builder(active_connection)
 
 			#Delete temporary table
-			self.execute("DROP TEMPOERARY TABLE IF EXISTS "+tmptablename)
+			self.execute("DROP TEMPORARY TABLE IF EXISTS "+tmptablename)
 
 			#Create a temporary table
 			table = TemporaryTable(tmptablename, pandas_engine, frame=tmp_table, if_exists="append")
@@ -154,7 +154,7 @@ class MocaEngine:
 			pandas_engine = pandasSQL_builder(active_connection)
 
 			#Delete temporary table
-			self.execute("DROP TEMPOERARY TABLE IF EXISTS "+tmptablename)
+			self.execute("DROP TEMPORARY TABLE IF EXISTS "+tmptablename)
 
 			#Create a temporary table
 			table = TemporaryTable(tmptablename, pandas_engine, frame=tmp_table, if_exists="append")
