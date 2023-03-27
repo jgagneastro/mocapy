@@ -97,8 +97,8 @@ class MocaEngine:
 		if tmp_table is not None:
 			
 			#Determine a temporary table name for the database
-			#tmptablename = 'tmp_table_'+str(uuid.uuid4()).replace('-','')
-			tmptablename = 'tmp_table'
+			tmptablename = 'tmp_table_'+str(uuid.uuid4()).replace('-','')
+			#tmptablename = 'tmp_table'
 
 			#Verify that the temporary table is a DataFrame
 			assert isinstance(tmp_table,pd.DataFrame), "The temporary table tmp_table passed to MocaEngine.query() must be a pandas DataFrame"
@@ -106,7 +106,7 @@ class MocaEngine:
 			pandas_engine = pandasSQL_builder(active_connection)
 
 			#Delete temporary table
-			self.execute("DROP TEMPORARY TABLE IF EXISTS "+tmptablename)
+			#self.execute("DROP TEMPORARY TABLE IF EXISTS "+tmptablename)
 
 			#Create a temporary table
 			table = TemporaryTable(tmptablename, pandas_engine, frame=tmp_table, if_exists="append", index=False)
@@ -116,7 +116,7 @@ class MocaEngine:
 			sql_engine = get_engine("auto")
 			total_inserted = sql_engine.insert_records(table=table,con=active_connection,frame=tmp_table,name=tmptablename)
 			
-			#sql_query = sql_query.replace('tmp_table',tmptablename)
+			sql_query = sql_query.replace('tmp_table',tmptablename)
 			#Testing that the temporary table exists
 			#d2 = pd.read_sql("SELECT * FROM tmp_table;",active_connection)
 			#print(d2)
@@ -145,8 +145,8 @@ class MocaEngine:
 		if tmp_table is not None:
 			
 			#Determine a temporary table name for the database
-			#tmptablename = 'tmp_table_'+str(uuid.uuid4()).replace('-','')
-			tmptablename = 'tmp_table'
+			tmptablename = 'tmp_table_'+str(uuid.uuid4()).replace('-','')
+			#tmptablename = 'tmp_table'
 
 			#Verify that the temporary table is a DataFrame
 			assert isinstance(tmp_table,pd.DataFrame), "The temporary table tmp_table passed to MocaEngine.query() must be a pandas DataFrame"
@@ -154,7 +154,7 @@ class MocaEngine:
 			pandas_engine = pandasSQL_builder(active_connection)
 
 			#Delete temporary table
-			self.execute("DROP TEMPORARY TABLE IF EXISTS "+tmptablename)
+			#self.execute("DROP TEMPORARY TABLE IF EXISTS "+tmptablename)
 
 			#Create a temporary table
 			table = TemporaryTable(tmptablename, pandas_engine, frame=tmp_table, if_exists="append", index=False)
@@ -164,7 +164,7 @@ class MocaEngine:
 			sql_engine = get_engine("auto")
 			total_inserted = sql_engine.insert_records(table=table,con=active_connection,frame=tmp_table,name=tmptablename)
 
-			#sql_query = sql_query.replace('tmp_table',tmptablename)
+			sql_query = sql_query.replace('tmp_table',tmptablename)
 
 		#Connect to the database and run the SQL execution statement
 		#with self.engine.connect() as connection:
