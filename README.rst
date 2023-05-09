@@ -21,6 +21,11 @@ Once this is done, you should see that your command line now stars with the "(mo
 
     pip install -r requirements.txt
 
+Instead of navigating to your mocapy installation directory, you can also alternatively just download the requirements file wherever your environment was created with something like wget (or manually download requirements.txt from this repo) and then install the contents::
+
+    wget https://raw.githubusercontent.com/jgagneastro/mocapy/main/requirements.txt
+    pip install -r requirements.txt
+
 Once the packages are installed, you should be able to launch Python and use mocapy normally. Note every time you need to use mocapy, you should launch the same mocapy Python environment, by navigating wherever you have created it, and launching the same command again::
 
     source mocapy_env/bin/activate
