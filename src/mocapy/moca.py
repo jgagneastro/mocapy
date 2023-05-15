@@ -121,6 +121,9 @@ class MocaEngine:
 			#d2 = pd.read_sql("SELECT * FROM tmp_table;",active_connection)
 			#print(d2)
 
+		#Replace problematic cases of % characters
+		sql_query.replace("%","%%")
+
 		#Execute the query
 		df = pd.read_sql(sql_query, active_connection)
 		
