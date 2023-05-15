@@ -177,6 +177,8 @@ class MocaEngine:
 		for subq in queries:
 			if subq.strip() == '':
 				continue
+			#Replace problematic cases of % characters
+			subq.replace("%","%%")
 			rs = active_connection.execute(subq.strip()+';')
 
 		#Close the connection unless it is maintained outside of this method
