@@ -122,7 +122,7 @@ class MocaEngine:
 			#print(d2)
 
 		#Replace problematic cases of % characters
-		sql_query.replace("%","%%")
+		sql_query = sql_query.replace("%","%%")
 
 		#Execute the query
 		df = pd.read_sql(sql_query, active_connection)
@@ -178,7 +178,7 @@ class MocaEngine:
 			if subq.strip() == '':
 				continue
 			#Replace problematic cases of % characters
-			subq.replace("%","%%")
+			subq = subq.replace("%","%%")
 			rs = active_connection.execute(subq.strip()+';')
 
 		#Close the connection unless it is maintained outside of this method
