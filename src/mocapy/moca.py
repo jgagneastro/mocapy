@@ -8,6 +8,7 @@ from sqlalchemy import create_engine
 import pandas as pd
 import numpy as np
 from urllib.parse import quote_plus as urlquote #This is useful to avoid problems with special characters in passwords
+from sqlalchemy import text
 import os
 import uuid
 
@@ -179,7 +180,10 @@ class MocaEngine:
 				continue
 			#Replace problematic cases of % characters
 			subq = subq.replace("%","%%")
-			rs = active_connection.execute(subq.strip()+';')
+			rs = active_connection.execute(text(subq.strip()+';'))
+
+		#Commit changes to the db
+		active_connection.commit()
 
 		#Close the connection unless it is maintained outside of this method
 		#active_connection.commit()#This appears to generate an error ?
