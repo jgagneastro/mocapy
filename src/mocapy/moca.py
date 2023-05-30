@@ -126,7 +126,7 @@ class MocaEngine:
 		sql_query = sql_query.replace("%","%%")
 
 		#Execute the query
-		df = pd.read_sql(sql_query, active_connection)
+		df = pd.read_sql(text(sql_query), active_connection)
 		
 		#Close the connection unless it is maintained outside of this method
 		if self.connection is None:
