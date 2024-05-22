@@ -4,11 +4,10 @@
 #python -m venv mocapy-env
 #source mocapy-env/bin/activate
 
-from sqlalchemy import create_engine
+from sqlalchemy import create_engine, text
 import pandas as pd
 import numpy as np
 from urllib.parse import quote_plus as urlquote #This is useful to avoid problems with special characters in passwords
-from sqlalchemy import text
 import os
 import uuid
 
@@ -17,21 +16,20 @@ __email__ = 'jonathan.gagne@astro.umontreal.ca'
 
 __all__ = ["MocaEngine"]
 
+#This is not required anymore
 #Hack pandas to make it upload temporary SQL tables, inspired from https://gist.github.com/alecxe/44682f79b18f0c82a99c
-from pandas.io.sql import SQLTable, pandasSQL_builder, get_engine, _gt14
+from pandas.io.sql import SQLTable, pandasSQL_builder, get_engine
+
 class TemporaryTable(SQLTable):
 	#Override the _execute_create method such that the table that is created has the correct TEMPORARY prefix
 	def _execute_create(self):
 		# Inserting table into database, add to MetaData object
-		if _gt14():
-			self.table = self.table.to_metadata(self.pd_sql.meta)
-		else:
-			self.table = self.table.tometadata(self.pd_sql.meta)
+		self.table = self.table.to_metadata(self.pd_sql.meta)
 		
 		# allow creation of temporary tables
 		self.table._prefixes.append('TEMPORARY')
 
-		self.table.create(bind=self.pd_sql.connectable)
+		self.table.create(bind=self.pd_sql.con)
 
 class MocaEngine:
 
@@ -96,7 +94,7 @@ class MocaEngine:
 			
 		#Upload a temporary table if needed
 		if tmp_table is not None:
-			
+
 			#Determine a temporary table name for the database
 			tmptablename = 'tmp_table_'+str(uuid.uuid4()).replace('-','')
 			#tmptablename = 'tmp_table'
