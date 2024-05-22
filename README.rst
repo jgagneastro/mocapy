@@ -3,11 +3,13 @@ mocapy
 
 **A Python package to interact with the MOCA database**
 
+The latest version of this package was only tested with Python 3.12.3 installed with a Mac M1-native conda setup.
+
 You can install this package with the following command::
 
     pip install git+https://github.com/jgagneastro/mocapy.git
 
-One the package is installed, it is *imperative* to create a Python environment dedicated to its use, and install the exact versions of the packages that were used in its development. This is true because several Python packages will change over time in a non-retrocompatible way.
+One the package is installed, it is *imperative* to create a Python environment or a conda environment dedicated to its use, and install the exact versions of the packages that were used in its development. This is true because several Python packages will change over time in a non-retrocompatible way.
 
 In order to create your own Python environment, open a terminal, navigate somewhere you will remember (e.g. your mocapy directory), and enter the following command::
 
@@ -17,7 +19,18 @@ This will create a mocapy_env directory where the exact versions of the Python p
 
     source mocapy_env/bin/activate
 
-Once this is done, you should see that your command line now stars with the "(mocapy_env) " flag before the usual prompts. Once you are located in this environment, you need to install all packages with the following command (here I am assuming you have navigated to the mocapy directory)::
+Alternatively, you can create a conda environment for mocapy and then install the package inside that environment with::
+
+    conda create --name mocapy_env python==3.12.3
+	conda activate mocapy_env
+	pip install git+https://github.com/jgagneastro/mocapy.git
+
+Note that you can choose your own environment name instead of mocapy_env.
+
+Once this is done, you should see that your command line now stars with the "(mocapy_env) " flag before the usual prompts. 
+
+
+If you have downloaded the GitHub repository instead of installing it, you need to add it to your PYTHONPATH and then manually install all packages with the following command (here I am assuming you have navigated to the mocapy directory)::
 
     pip install -r requirements.txt
 
@@ -29,6 +42,10 @@ Instead of navigating to your mocapy installation directory, you can also altern
 Once the packages are installed, you should be able to launch Python and use mocapy normally. Note every time you need to use mocapy, you should launch the same mocapy Python environment, by navigating wherever you have created it, and launching the same command again::
 
     source mocapy_env/bin/activate
+
+If you used the conda environment instead of the pyenv environment, then you will do this instead (from anywhere)::
+
+    conda activate mocapy_env
 
 Documentation
 -------------
@@ -77,7 +94,7 @@ If you would like to use your own list of stellar designations, we have provided
     mdf = moca.query("SELECT tt.designation AS input_designation, sam.* FROM tmp_table AS tt LEFT JOIN mechanics_all_designations AS mad ON(mad.designation LIKE tt.designation) LEFT JOIN summary_all_objects AS sam ON(sam.moca_oid=mad.moca_oid)", tmp_table=df)
     
     # Display mdf summary
-    mdf
+    print(mdf)
 
 You should get an output similar to this::
 
