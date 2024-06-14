@@ -114,7 +114,7 @@ Visualizing spectra and color-magnitude diagrams
 
 *Get_cmd* is a MOCA tool that plots a color-magnitude diagram (the absolute M band magnitude as a function of the difference between the magnitudes of m1 and m2 bands) of the database field brown dwarfs sequence and overplots a manually entered object. For the moment, the use of this tool requires *collaborators* access to the database.
 
-To overplot the entered object, the difference of m1 and m2 and the absolute magnitude of band M must be provided as m1m2 and M, respectively, along with their uncertainties as em1m2 and eM. 
+To overplot the entered object, the difference of m1 and m2 and the absolute magnitude of band M must be provided as *m1m2* and *M*, respectively, along with their uncertainties as *em1m2* and *eM*. 
 
 Each m1, m2 and M band can be specified using the exact unique photometry system identifier (*moca_psid*) of the moca_photometry_systems table or, more generally, the terms *"j_any"*, *"h_any"* and *"k_any"*. The bands are specified as strings through the variables *m1_type*, *m2_type* and *M_type*.
 
@@ -156,13 +156,57 @@ For example, to plot an entered object with an absolute magnitude in the band *m
     :alt: cmd1
     :align: center
 
-If you want to plot this object over the sequence showing the spectral types and the young objects (low to intermediate gravity), you can use the parameters named *spt* and *young_seq*::
+If you want to plot this object over the sequence showing the spectral types and the young objects (low to intermediate gravity), you can use the parameters *spt* and *young_seq*::
 
     mocaviz.get_cmd(1, 11, 0.1, 0.3, "mko_jmag", "mko_kmag", "mko_jmag", spt = True, young_seq = True, con = con)
 
 .. image:: docs/cmd2.png 
     :width: 450
     :alt: cmd2
+    :align: center
+
+
+*Get_spectrum* is a MOCA tool that plots the spectrum of the provided target as is or over a second target or MOCA database spectrum type reference models. For the moment, the use of this tool requires collaborators access to the database.
+
+To display the spectrum of an object, either its designation or its unique spectrum identifier for the MOCA database (*moca_specid*) as *moca_specid* and *designation* must be provided. To add a background target spectrum, its moca_specid or designation must be specified as *moca_specid2* and *designation2*. 
+
+To set the connection, add the appropriate environment parameters *moca_username*, *moca_password*, *moca_host* and *moca_dbname* following the *engine* command below and provide this connection to get_spectrum through the parameter *con*. If no connection is specified, the default public connection is used, which does not yet give the access to the tool.
+
+The following Python command will allow you to display the spectrum::
+
+    #Import the mocapy package
+    import mocapy
+    from mocapy import MocaEngine
+    from mocapy import MocaViz
+
+    #Set the Moca connection (as collaborators for now) :
+    engine = create_engine("mysql+pymysql://"+moca_username+":"+urlquote(moca_password)+"@"+moca_host+"/"+moca_dbname)
+    con = engine.connect()
+
+    #Create a mocaViz object
+    mocaviz = Mocaviz()
+
+    #Call the function get_spectrum :
+    mocaviz.get_spectrum(moca_specid, designation, moca_specid2, designation2, spt_ref, sptn_int, gravity_class, path, con)
+
+For exemple, to plot two spectrums from moca_specids 500 and 527, the command would be::
+
+    mocaviz.get_spectrum(moca_specid = 500, moca_specid2 = 527, con = con)
+
+.. image:: docs/spectrum1.png 
+    :width: 450
+    :alt: sp1
+    :align: center
+
+You can also plot the target spectrum over reference spectrums of given or automatic spectral type number interval by specifying spt_ref = True. If not specified, this parameter is False and the reference spectrums are not displayed. The parameter sptn_int allows you to provide a specific interval of spectral type numbers, where 0 is M0, 10 is L0 and -10 is K0, as a list. The gravity class or classes (‘alpha’, ‘beta’ or ‘gamma’) can also be specified as a list of strings to the parameter gravity_class. The default sptn_int and gravity_class are [7, 20], [‘alpha’, ‘beta’, ‘gamma’], respectively. 
+
+For example, the command could be::
+
+    mocaviz.get_spectrum(moca_specid = 500, spt_ref = True, sptn_int = [7, 10], gravity_class = ['alpha', 'gamma'], con = con)
+
+.. image:: docs/spectrum2.png 
+    :width: 450
+    :alt: sp2
     :align: center
 
 
