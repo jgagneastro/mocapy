@@ -108,6 +108,64 @@ You should get an output similar to this::
 
 In this example, the last two stars did not have a match in the MOCA database, and thus the pandas DataFrame contains missing values.
 
+
+Visualizing spectra and color-magnitude diagrams
+-----------------------
+
+*Get_cmd* is a MOCA tool that plots a color-magnitude diagram (the absolute M band magnitude as a function of the difference between the magnitudes of m1 and m2 bands) of the database field brown dwarfs sequence and overplots a manually entered object. For the moment, the use of this tool requires *collaborators* access to the database.
+
+To overplot the entered object, the difference of m1 and m2 and the absolute magnitude of band M must be provided as m1m2 and M, respectively, along with their uncertainties as em1m2 and eM. 
+
+Each m1, m2 and M band can be specified using the exact unique photometry system identifier (*moca_psid*) of the moca_photometry_systems table or, more generally, the terms *"j_any"*, *"h_any"* and *"k_any"*. The bands are specified as strings through the variables *m1_type*, *m2_type* and *M_type*.
+
+Some parameters can also be added to the CMD::
+
+    spt : (bool) Plot the spectral types of the field BD reference sequence (default = False)
+    young_objs : (bool) Plot the intermediate and low gravity substellar objects over the field reference sequence (default = False)
+    ref_err : (bool) Plot the error bars of the field BD reference sequence (default = False)
+    xmin, xmax = x-axis range (default = None, the range is automatically estimated)
+    ymin, ymax = y-axis range (default = None, the range is automatically estimated)
+    path = Path for saving the figure (default = None)
+    con = Connection to the database
+
+To set the connection, add the right environment parameters *moca_username*, *moca_password*, *moca_host* and *moca_dbname* following the *engine* command below and provide this connection to get_cmd through the parameter *con*. If no connection is specified, the default public connection is used, which does not give the access to the tool yet.
+
+The following Python command will allow you to compare the magnitudes M and m1m2 of the entered object with the field brown dwarf sequence::
+
+    #Import the mocapy package
+    import mocapy
+    from mocapy import MocaEngine
+    from mocapy import MocaViz
+
+    #Set the MOCA connection (as collaborators for now) :
+    engine = create_engine("mysql+pymysql://"+moca_username+":"+urlquote(moca_password)+"@"+moca_host+"/"+moca_dbname)
+    con = engine.connect()
+
+    #Create a mocaViz object
+    mocaviz = MocaViz()
+
+    #Call the function get_cmd :
+    mocaviz.get_cmd(m1m2, M, em1m2, eM, m1_type, m2_type, M_type, spt, young_objs, ref_err, xmin, xmax, ymin, ymax, path, con)
+
+For example, to plot an entered object with an absolute magnitude in the band *mko_jmag* and difference between the bands *mko_jmag* and *mko_kmag* equal to 11 and 1, respectively, and their uncertainties over the sequence, you can use the following command::
+
+    mocaviz.get_cmd(1, 11, 0.1, 0.3, "mko_jmag", "mko_kmag", "mko_jmag", con = con)
+
+.. image:: docs/cmd1.png 
+    :width: 350
+    :alt: cmd1
+    :align: center
+
+If you want to plot this object over the sequence showing the spectral types and the young objects (low to intermediate gravity), you can use the parameters named *spt* and *young_seq*::
+
+    mocaviz.get_cmd(1, 11, 0.1, 0.3, "mko_jmag", "mko_kmag", "mko_jmag", spt = True, young_seq = True, con = con)
+
+.. image:: docs/cmd2.png 
+    :width: 350
+    :alt: cmd2
+    :align: center
+
+
 More details about MOCA
 -----------------------
 
