@@ -9,3 +9,4 @@ __all__ = ["MocaEngine"]
 
 #Import the local moca.py file
 from .moca import MocaEngine
+from .moca import MocaViz
