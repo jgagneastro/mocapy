@@ -22,7 +22,7 @@ CLASSIFIERS = [
     "Operating System :: OS Independent",
     "Programming Language :: Python",
 ]
-INSTALL_REQUIRES = ["numpy==1.26.4","pandas==2.2.2","SQLAlchemy==2.0.30","PyMySQL==1.1.1","uuid==1.30"]
+INSTALL_REQUIRES = ["numpy==1.26.4","pandas==2.2.2","SQLAlchemy==2.0.30","PyMySQL==1.1.1","uuid==1.30","matplotlib==3.9.0"]
 SETUP_REQUIRES = [
     "setuptools>=40.6.0",
     "setuptools_scm",
