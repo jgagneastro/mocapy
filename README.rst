@@ -189,7 +189,7 @@ The following Python command will allow you to display the spectrum::
     #Call the function get_spectrum :
     mocaviz.get_spectrum(moca_specid, designation, moca_specid2, designation2, spt_ref, sptn_int, gravity_class, path, con)
 
-For exemple, to plot two spectra from moca_specids 500 and 527, the command would be::
+For example, to plot two spectra from moca_specids 500 and 527, the command would be::
 
     mocaviz.get_spectrum(moca_specid = 500, moca_specid2 = 527, con = con)
 
