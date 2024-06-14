@@ -152,7 +152,7 @@ For example, to plot an entered object with an absolute magnitude in the band *m
     mocaviz.get_cmd(1, 11, 0.1, 0.3, "mko_jmag", "mko_kmag", "mko_jmag", con = con)
 
 .. image:: docs/cmd1.png 
-    :width: 350
+    :width: 450
     :alt: cmd1
     :align: center
 
@@ -161,7 +161,7 @@ If you want to plot this object over the sequence showing the spectral types and
     mocaviz.get_cmd(1, 11, 0.1, 0.3, "mko_jmag", "mko_kmag", "mko_jmag", spt = True, young_seq = True, con = con)
 
 .. image:: docs/cmd2.png 
-    :width: 350
+    :width: 450
     :alt: cmd2
     :align: center
 
