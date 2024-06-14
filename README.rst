@@ -189,7 +189,7 @@ The following Python command will allow you to display the spectrum::
     #Call the function get_spectrum :
     mocaviz.get_spectrum(moca_specid, designation, moca_specid2, designation2, spt_ref, sptn_int, gravity_class, path, con)
 
-For exemple, to plot two spectrums from moca_specids 500 and 527, the command would be::
+For exemple, to plot two spectra from moca_specids 500 and 527, the command would be::
 
     mocaviz.get_spectrum(moca_specid = 500, moca_specid2 = 527, con = con)
 
@@ -198,7 +198,7 @@ For exemple, to plot two spectrums from moca_specids 500 and 527, the command wo
     :alt: sp1
     :align: center
 
-You can also plot the target spectrum over reference spectrums of given or automatic spectral type number interval by specifying spt_ref = True. If not specified, this parameter is False and the reference spectrums are not displayed. The parameter sptn_int allows you to provide a specific interval of spectral type numbers, where 0 is M0, 10 is L0 and -10 is K0, as a list. The gravity class or classes (‘alpha’, ‘beta’ or ‘gamma’) can also be specified as a list of strings to the parameter gravity_class. The default sptn_int and gravity_class are [7, 20], [‘alpha’, ‘beta’, ‘gamma’], respectively. 
+You can also plot the target spectrum over reference spectra of given or automatic spectral type number interval by specifying spt_ref = True. If not specified, this parameter is False and the reference spectra are not displayed. The parameter sptn_int allows you to provide a specific interval of spectral type numbers, where 0 is M0, 10 is L0 and -10 is K0, as a list. The gravity class or classes ('alpha', 'beta' or 'gamma') can also be specified as a list of strings to the parameter gravity_class. The default sptn_int and gravity_class are [7, 20], ['alpha', 'beta', 'gamma'], respectively. 
 
 For example, the command could be::
 
