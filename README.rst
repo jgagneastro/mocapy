@@ -179,12 +179,21 @@ The following Python command will allow you to display the spectrum::
     from mocapy import MocaEngine
     from mocapy import MocaViz
 
+    #Set the database connection creditials - here, we are using a custom connection because the MocaViz package is currently in beta phase and only available for internal collaborators (it will become public soon). Therefore, if you are part of the collaboration you can replace the credentials below. Once MocaViz is fully released, replacing the Moca connection as below will not be necessary.
+
+    moca_username = "104.248.106.21"
+    moca_dbname = "mocadb"
+    moca_username = "public"
+    moca_password = "z@nUg_2h7_%?31y88"
+    
     #Set the Moca connection (as collaborators for now) :
+    from urllib.parse import quote_plus as urlquote
+    from sqlalchemy import create_engine
     engine = create_engine("mysql+pymysql://"+moca_username+":"+urlquote(moca_password)+"@"+moca_host+"/"+moca_dbname)
     con = engine.connect()
 
     #Create a mocaViz object
-    mocaviz = Mocaviz()
+    mocaviz = MocaViz()
 
     #Call the function get_spectrum :
     mocaviz.get_spectrum(moca_specid, designation, moca_specid2, designation2, spt_ref, sptn_int, gravity_class, path, con)
