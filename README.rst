@@ -209,6 +209,17 @@ For example, the command could be::
     :alt: sp2
     :align: center
 
+Instead of plotting the spectrum/spectra, you can use the keyword *return_data = True* when calling *get_spectrum* to return the spectrum/spectra as Pandas dataFrames. 
+
+The command could be ::
+
+    df = mocaviz.get_spectrum(moca_specid = 500, return_data = True, con = con)
+
+Or ::
+
+    df1, df2 = mocaviz.get_spectrum(moca_specid = 500, moca_specid2 = 527, return_data = True, con = con)
+
+The output spectrum is given by the columns *lam* (wavelength), *sp* (flux) and *esp* (flux_unc). The flux units are given in the column *flux_units*.
 
 More details about MOCA
 -----------------------

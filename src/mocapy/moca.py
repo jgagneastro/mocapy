@@ -456,7 +456,7 @@ class MocaViz:
 		plt.show()
 		plt.close()
 
-	def get_spectrum(self, moca_specid = None, designation = None, moca_specid2 = None, designation2 = None, spt_ref = False, sptn_int = [7, 20], gravity_class = ['alpha', 'beta', 'gamma'], path = None, con = None) :
+	def get_spectrum(self, moca_specid = None, designation = None, moca_specid2 = None, designation2 = None, spt_ref = False, sptn_int = [7, 20], gravity_class = ['alpha', 'beta', 'gamma'], return_data = False, path = None, con = None) :
 		
 
 		'''moca_specid, designation : identification of the provided target
@@ -464,6 +464,7 @@ class MocaViz:
 		spt_ref : (bool) to display the reference spectrum of the spectral type of sptn_int (default = False)
 		sptn_int : spectral type number interval (default = [7, 20])
 		gravity_class : specified gravity class (alpha, beta, gamma or any combination of them, default = ['alpha', 'beta', 'gamma'])
+		return_data : (bool) if True, the spectrum/spectra is/are returned as a pandas dataFrame when calling get_spectrum instead of plotted (default = False)
 		path : path of figure saving (default = None)
 		con : connection to the database (default = None, public connection)'''
 
@@ -669,6 +670,17 @@ class MocaViz:
 		#Plot the spectrums :
 		if df_sp is not None and not df_sp.empty :
 			plot_spectrum(df_sp, df_ref, sptn_list = unique_values, gravity_class_list= g_class)
+
+		#Return data :
+		if return_data and df_sp is not None :
+			
+			if moca_specid2 is None and designation2 is None :
+
+				return df_sp
+			
+			elif moca_specid2 is not None or designation2 is not None :
+
+				return df_sp, df_ref
 
 
 #import pdb; pdb.set_trace()
