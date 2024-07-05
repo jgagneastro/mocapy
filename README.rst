@@ -181,7 +181,7 @@ The following Python command will allow you to display the spectrum::
 
     #Set the database connection creditials - here, we are using a custom connection because the MocaViz package is currently in beta phase and only available for internal collaborators (it will become public soon). Therefore, if you are part of the collaboration you can replace the credentials below. Once MocaViz is fully released, replacing the Moca connection as below will not be necessary.
 
-    moca_username = "104.248.106.21"
+    moca_host = "104.248.106.21"
     moca_dbname = "mocadb"
     moca_username = "public"
     moca_password = "z@nUg_2h7_%?31y88"
