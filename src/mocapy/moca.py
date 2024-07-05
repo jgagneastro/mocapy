@@ -668,7 +668,7 @@ class MocaViz:
 			g_class = gravity_class
 
 		#Plot the spectrums :
-		if df_sp is not None and not df_sp.empty :
+		if df_sp is not None and not df_sp.empty and not return_data :
 			plot_spectrum(df_sp, df_ref, sptn_list = unique_values, gravity_class_list= g_class)
 
 		#Return data :
