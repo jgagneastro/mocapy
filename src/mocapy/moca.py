@@ -362,9 +362,9 @@ class MocaViz:
 			marker_list = ['D', 'v']
 
 			def plot_young(df_list, df_color) : 
-				for i, dfy in enumerate(df_young_list) :
+				for i, dfy in enumerate(df_list) :
 						ax.errorbar(dfy['b1mag']-dfy['b2mag'], dfy['Bmag_abs'], xerr=dfy['b1b2_unc'], yerr=dfy['Bmag_abs_unc'], 
-								mec=df_color[i], mfc = '#FFFFFF', ecolor=df_color[i], marker=marker_list[i], markersize=3.5, markeredgewidth = 0.75, fmt=' ', label= str(dfy.at[0, 'grav_type'])+' substellar objects')
+								mec=df_color[i], mfc = '#FFFFFF', ecolor=df_color[i], marker=marker_list[i], markersize=3.5, markeredgewidth = 1, fmt=' ', label= str(dfy.at[0, 'grav_type'])+' substellar objects')
 
 		# Create a figure and an axes :
 		fig, ax = plt.subplots()
@@ -381,7 +381,7 @@ class MocaViz:
 				ax.scatter(dfnew['b1mag']-dfnew['b2mag'], dfnew['Bmag_abs'], edgecolors='#808080', marker='.', s=10, alpha=0.3, label='Field substellar objects')
 				if young_seq:
 					for i, dfy in enumerate(df_young_list) :
-						ax.scatter(dfy['b1mag']-dfy['b2mag'], dfy['Bmag_abs'], facecolors = '#FFFFFF', edgecolors=df_young_color2[i], linewidths = 0.75, marker=marker_list[i], s=12, label=str(dfy.at[0, 'grav_type'])+' substellar objects')
+						ax.scatter(dfy['b1mag']-dfy['b2mag'], dfy['Bmag_abs'], facecolors = '#FFFFFF', edgecolors=df_young_color2[i], linewidths = 1, marker=marker_list[i], s=12, label=str(dfy.at[0, 'grav_type'])+' substellar objects')
 		else:
 			# Create a colormap for the spectral types
 			sptn_list = list(pd.unique(dfnew['sptn'])) 
@@ -402,13 +402,21 @@ class MocaViz:
 								color=sptn_color[i], ecolor='#808080', marker='.', markersize=3, alpha=0.5, fmt=' ')
 						
 				if young_seq:
-					plot_young(df_young_list, df_young_color)
-					
+					for y, dfy in enumerate(df_young_list) :
+						sptn_color_young = np.array([(sm.to_rgba(v)) for v in dfy['sptn']])
+						for i, color in enumerate(sptn_color_young) :
+							if i == 0 :
+								ax.errorbar(dfy.at[i,'b1mag']-dfy.at[i, 'b2mag'], dfy.at[i, 'Bmag_abs'], xerr=dfy.at[i, 'b1b2_unc'], yerr=dfy.at[i, 'Bmag_abs_unc'], 
+									mec=df_young_color[y], color = sptn_color_young[i], ecolor=df_young_color[y], marker=marker_list[y], markersize=3.5, markeredgewidth = 1, fmt=' ', label= str(dfy.at[0, 'grav_type'])+' substellar objects')
+							else : 
+								ax.errorbar(dfy.at[i,'b1mag']-dfy.at[i, 'b2mag'], dfy.at[i, 'Bmag_abs'], xerr=dfy.at[i, 'b1b2_unc'], yerr=dfy.at[i, 'Bmag_abs_unc'], 
+										mec=df_young_color[y], color = sptn_color_young[i], ecolor=df_young_color[y], marker=marker_list[y], markersize=3.5, markeredgewidth = 1, fmt=' ')				
 			else:
 				ax.scatter(dfnew['b1mag'] - dfnew['b2mag'], dfnew['Bmag_abs'], c=dfnew['sptn'], cmap=cmap, norm=norm, marker='.', s=10, alpha=0.5, label = 'Field substellar objects')
+				
 				if young_seq:
 					for i, dfy in enumerate(df_young_list) :
-						ax.scatter(dfy['b1mag']-dfy['b2mag'], dfy['Bmag_abs'], facecolors = '#FFFFFF', edgecolors=df_young_color[i], linewidths = 0.75, marker=marker_list[i], s=12, label=str(dfy.at[0, 'grav_type'])+' substellar objects')
+						ax.scatter(dfy['b1mag']-dfy['b2mag'], dfy['Bmag_abs'], facecolors='#FFFFFF', c=dfy['sptn'], edgecolors=df_young_color[i], cmap=cmap, norm=norm, linewidths = 1, marker=marker_list[i], s=14, label=str(dfy.at[0, 'grav_type'])+' substellar objects')
 			
 			# Add a color bar to the plot
 			cbar = plt.colorbar(sm, ax=ax)
