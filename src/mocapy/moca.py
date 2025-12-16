@@ -13,6 +13,7 @@ import matplotlib.cm as cm
 from urllib.parse import quote_plus as urlquote #This is useful to avoid problems with special characters in passwords
 import os
 import uuid
+import traceback
 
 __author__ = 'Jonathan Gagne'
 __email__ = 'jonathan.gagne@astro.umontreal.ca'
@@ -46,34 +47,19 @@ class MocaEngine:
 		default_dbname = 'mocadb'
 
 		#Read connection information for the database
-		env_username = os.environ.get('MOCA_USERNAME')
-		if env_username is not None:
-			self.moca_username = env_username
-		else:
-			self.moca_username = default_username
-
-		env_password = os.environ.get('MOCA_PASSWORD')
-		if env_password is not None:
-			self.moca_password = env_password
-		else:
-			self.moca_password = default_password
-
-		env_dbname = os.environ.get('MOCA_DBNAME')
-		if env_dbname is not None:
-			self.moca_dbname = env_dbname
-		else:
-			self.moca_dbname = default_dbname
-
-		env_host = os.environ.get('MOCA_HOST')
-		if env_host is not None:
-			self.moca_host = env_host
-		else:
-			self.moca_host = default_host
+		#Modded on Aug 22 2024 to compress the code
+		env_username = os.environ.get('MOCA_USERNAME', default_username)
+		env_password = os.environ.get('MOCA_PASSWORD', default_password)
+		env_dbname = os.environ.get('MOCA_DBNAME', default_dbname)
+		env_host = os.environ.get('MOCA_HOST', default_host)
 
 		#Prepare the database engine
 		#print('mysql+pymysql://'+self.moca_username+':'+urlquote(self.moca_password)+'@'+self.moca_host+'/'+self.moca_dbname)
 		#.replace('@','%40').replace('%21','$')
-		self.engine = create_engine('mysql+pymysql://'+self.moca_username+':'+urlquote(self.moca_password)+'@'+self.moca_host+'/'+self.moca_dbname)
+		#self.engine = create_engine('mysql+pymysql://'+self.moca_username+':'+urlquote(self.moca_password)+'@'+self.moca_host+'/'+self.moca_dbname)
+		#Improved slightly on Aug 22 2024
+		connection_string = f'mysql+pymysql://{env_username}:{urlquote(env_password)}@{env_host}/{env_dbname}'
+		self.engine = create_engine(connection_string)
 
 		#By default mocapy has no active connection
 		self.connection = None
@@ -119,6 +105,7 @@ class MocaEngine:
 			total_inserted = sql_engine.insert_records(table=table,con=active_connection,frame=tmp_table,name=tmptablename)
 			
 			sql_query = sql_query.replace('tmp_table',tmptablename)
+			print(sql_query)
 			#Testing that the temporary table exists
 			#d2 = pd.read_sql("SELECT * FROM tmp_table;",active_connection)
 			#print(d2)
@@ -136,52 +123,112 @@ class MocaEngine:
 		return(df)
 
 	#This generally requires admin privileges
-	def execute(self,sql_query,tmp_table=None):
+	def execute(self, sql_query, tmp_table=None, return_diagnostics=False, continue_on_error=None):
 		
+		# Optional diagnostics (kept off by default for backwards compatibility)
+		# If continue_on_error is not provided, default it to return_diagnostics:
+		# - Legacy behavior (return_diagnostics=False): stop/raise on first error
+		# - Diagnostics behavior (return_diagnostics=True): continue through all statements unless user overrides
+		if continue_on_error is None:
+			continue_on_error = bool(return_diagnostics)
+
+		errors = []
+		rowcounts = []
+		affected_total = 0
+		rs = None
+
 		#Connect to the database if needed, and run the SQL query
 		if self.connection is not None:
 			print(' Using a SQL connection maintained outside of the mocapy package')
-			active_connection=self.connection
-		
+			active_connection = self.connection
+
 		if self.connection is None:
-			active_connection=self.engine.connect()
+			active_connection = self.engine.connect()
 
 		#Upload a temporary table if needed
 		if tmp_table is not None:
-			
-			#Determine a temporary table name for the database
-			tmptablename = 'tmp_table_'+str(uuid.uuid4()).replace('-','')
-			#tmptablename = 'tmp_table'
+			try:
+				#Determine a temporary table name for the database
+				tmptablename = 'tmp_table_' + str(uuid.uuid4()).replace('-', '')
+				#tmptablename = 'tmp_table'
 
-			#Verify that the temporary table is a DataFrame
-			assert isinstance(tmp_table,pd.DataFrame), "The temporary table tmp_table passed to MocaEngine.query() must be a pandas DataFrame"
+				#Verify that the temporary table is a DataFrame
+				assert isinstance(tmp_table, pd.DataFrame), "The temporary table tmp_table passed to MocaEngine.query() must be a pandas DataFrame"
 
-			pandas_engine = pandasSQL_builder(active_connection)
+				pandas_engine = pandasSQL_builder(active_connection)
 
-			#Delete temporary table
-			#self.execute("DROP TEMPORARY TABLE IF EXISTS "+tmptablename)
+				#Delete temporary table
+				#self.execute("DROP TEMPORARY TABLE IF EXISTS "+tmptablename)
 
-			#Create a temporary table
-			table = TemporaryTable(tmptablename, pandas_engine, frame=tmp_table, if_exists="append", index=False)
-			table.create()
-				
-			#Insert records in temporary table
-			sql_engine = get_engine("auto")
-			total_inserted = sql_engine.insert_records(table=table,con=active_connection,frame=tmp_table,name=tmptablename)
+				#Create a temporary table
+				table = TemporaryTable(tmptablename, pandas_engine, frame=tmp_table, if_exists="append", index=False)
+				table.create()
 
-			sql_query = sql_query.replace('tmp_table',tmptablename)
+				#Insert records in temporary table
+				sql_engine = get_engine("auto")
+				total_inserted = sql_engine.insert_records(table=table, con=active_connection, frame=tmp_table, name=tmptablename)
+
+				sql_query = sql_query.replace('tmp_table', tmptablename)
+			except Exception as e:
+				errors.append(repr(e) + "\n" + traceback.format_exc())
+				# In diagnostics mode, return instead of raising
+				if return_diagnostics:
+					try:
+						active_connection.rollback()
+					except Exception:
+						pass
+					return {
+						"rs": None,
+						"rowcounts": rowcounts,
+						"affected_total": affected_total,
+						"errors": errors,
+					}
+				raise
 
 		#Connect to the database and run the SQL execution statement
 		#with self.engine.connect() as connection:
-		
+
 		#Split individual query into an array of queries
 		queries = sql_query.split(';')
 		for subq in queries:
 			if subq.strip() == '':
 				continue
 			#Replace problematic cases of % characters
-			subq = subq.replace("%","%%")
-			rs = active_connection.execute(text(subq.strip()+';'))
+			subq = subq.replace("%", "%%")
+
+			try:
+				rs = active_connection.execute(text(subq.strip() + ';'))
+			except Exception as e:
+				# Record a readable error string (one per attempted statement)
+				errors.append(repr(e) + "\n" + traceback.format_exc())
+				rowcounts.append(None)
+
+				# If we're returning diagnostics, never raise through the IDL bridge.
+				# Roll back failed transaction state so we can either continue or return cleanly.
+				if return_diagnostics:
+					try:
+						active_connection.rollback()
+					except Exception:
+						pass
+					# If requested, keep going; otherwise return partial diagnostics immediately.
+					if continue_on_error:
+						continue
+					return {
+						"rs": None,
+						"rowcounts": rowcounts,
+						"affected_total": affected_total,
+						"errors": errors,
+					}
+
+				# Legacy behavior (no diagnostics): raise immediately
+				raise
+
+			# Success path for this statement
+			errors.append('')
+			rc = getattr(rs, 'rowcount', None)
+			rowcounts.append(rc)
+			if rc is not None and rc != -1:
+				affected_total += int(rc)
 
 		#Commit changes to the db
 		active_connection.commit()
@@ -190,8 +237,18 @@ class MocaEngine:
 		#active_connection.commit()#This appears to generate an error ?
 		if self.connection is None:
 			active_connection.close()
-		
-		return(rs)
+
+		# Backwards compatible default: return last CursorResult
+		if not return_diagnostics:
+			return rs
+
+		# Diagnostics mode: return per-statement rowcounts/errors and affected_total
+		return {
+			"rs": rs,
+			"rowcounts": rowcounts,
+			"affected_total": affected_total,
+			"errors": errors,
+		}
 
 	#This generally requires admin privileges
 	def call(self,sql_procedure):
