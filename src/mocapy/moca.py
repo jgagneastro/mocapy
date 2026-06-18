@@ -59,7 +59,7 @@ class MocaEngine:
 		#self.engine = create_engine('mysql+pymysql://'+self.moca_username+':'+urlquote(self.moca_password)+'@'+self.moca_host+'/'+self.moca_dbname)
 		#Improved slightly on Aug 22 2024
 		connection_string = f'mysql+pymysql://{env_username}:{urlquote(env_password)}@{env_host}/{env_dbname}'
-		self.engine = create_engine(connection_string)
+		self.engine = create_engine(connection_string, connect_args={"ssl": {"verify_mode": False, "check_hostname": False}})
 
 		#By default mocapy has no active connection
 		self.connection = None
