@@ -139,7 +139,7 @@ The following Python command will allow you to compare the magnitudes M and m1m2
     from sqlalchemy import create_engine
 
     #Set the MOCA connection (as collaborators for now) :
-    engine = create_engine("mysql+pymysql://"+moca_username+":"+urlquote(moca_password)+"@"+moca_host+"/"+moca_dbname)
+    engine = create_engine("mysql+pymysql://"+moca_username+":"+urlquote(moca_password)+"@"+moca_host+"/"+moca_dbname, connect_args={"ssl": {"verify_mode": False, "check_hostname": False}})
     con = engine.connect()
 
     #Create a mocaViz object
@@ -190,7 +190,7 @@ The following Python command will allow you to display the spectrum::
     #Set the Moca connection (as collaborators for now) :
     from urllib.parse import quote_plus as urlquote
     from sqlalchemy import create_engine
-    engine = create_engine("mysql+pymysql://"+moca_username+":"+urlquote(moca_password)+"@"+moca_host+"/"+moca_dbname)
+    engine = create_engine("mysql+pymysql://"+moca_username+":"+urlquote(moca_password)+"@"+moca_host+"/"+moca_dbname, connect_args={"ssl": {"verify_mode": False, "check_hostname": False}})
     con = engine.connect()
 
     #Create a mocaViz object
