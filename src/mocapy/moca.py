@@ -41,7 +41,7 @@ class MocaEngine:
 	def __init__(self):
 
 		#Default connection parameters in the absence of environment variables
-		default_host = '104.248.106.21'
+		default_host = 'mocadb.ca'
 		default_username = 'public'
 		default_password = 'z@nUg_2h7_%?31y88'
 		default_dbname = 'mocadb'
