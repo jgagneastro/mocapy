@@ -510,10 +510,10 @@ class MocaViz:
 			else :
 				ax.set_ylim(ymin, ymax)
 
-		ax.set_xlabel('$\it{'+str(m1_type)+' - '+str(m2_type)+'}$')
-		ax.set_ylabel('Absolute $\ \it{'+str(M_type)+'}$-band magnitude')
+		ax.set_xlabel(r'$\it{'+str(m1_type)+' - '+str(m2_type)+'}$')
+		ax.set_ylabel(r'Absolute $\ \it{'+str(M_type)+'}$-band magnitude')
 		ax.legend()
-		plt.title("$\it{"+str(m1_type)+"-"+str(m2_type)+"}$ = "+str(m1m2)+", $\  absolute\ \it{"+str(M_type)+"}$ = "+str(M))
+		plt.title(r"$\it{"+str(m1_type)+"-"+str(m2_type)+"}$ = "+str(m1m2)+r", $\  absolute\ \it{"+str(M_type)+"}$ = "+str(M))
 		plt.gca().invert_yaxis()
 		plt.tight_layout()
 		if path is not None :
@@ -590,10 +590,10 @@ class MocaViz:
 			#Adjust the scale of the y-axis values and the units shown in plot:
 			if df.at[0, 'flux_units'] == ' F_lambda $[W.m^{-2}]/[A]$' :
 				df[['sp', 'esp']] = df[['sp', 'esp']]*1e4
-				y_units = ' $[W.m^{-2}]/[\mu m]$'
+				y_units = r' $[W.m^{-2}]/[\mu m]$'
 			elif df.at[0, 'flux_units'] == 'F_lambda [W.m^-2]/[m]' :
 				df[['sp', 'esp']] = df[['sp', 'esp']]*1e-6
-				y_units = ' $[W.m^{-2}]/[\mu m]$'
+				y_units = r' $[W.m^{-2}]/[\mu m]$'
 			else : y_units = df.at[0, 'flux_units']
 
 			if df_ref is not None and not df_ref.empty : #Underplot the reference spectrum
@@ -668,7 +668,7 @@ class MocaViz:
 			
 			#Identify the axis and plot :
 			fig.text(0.02, 0.5, 'Spectral flux density', va='center', rotation='vertical', fontsize=10)
-			fig.text(0.52, 0.04, 'Wavelength [$\mu m$]', ha='center', fontsize=10)
+			fig.text(0.52, 0.04, r'Wavelength [$\mu m$]', ha='center', fontsize=10)
 			plt.suptitle(df.at[0, 'spectrum_name'], fontsize=11)
 			plt.tight_layout(rect=[0.05, 0.05, 1, 0.95])
 			if path is not None :
